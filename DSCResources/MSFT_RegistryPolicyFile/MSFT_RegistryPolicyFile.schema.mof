@@ -1,0 +1,10 @@
+[ClassVersion("1.0.0.0"), FriendlyName("RegistryPolicyFile")]
+class MSFT_RegistryPolicyFile : OMI_BaseResource
+{
+    [Key, Description("Indicates the path of the registry key for which you want to ensure a specific state. This path must include the hive.")] String Key;
+    [Required, Description("Indicates the name of the registry value.")] String ValueName;
+    [Write, Description("The data for the registry value.")] String ValueData;
+    [Write, Description("Indicates the type of the value. "), ValueMap{"Binary","Dword","ExpandString","MultiString","Qword ","String","None"}, Values{"Binary","Dword","ExpandString","MultiString","Qword","String","None"}] String ValueType;
+    [Write, Description("Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators."), ValueMap{"LocalMachine","User","Administrators","NonAdministrators"}, Values{"LocalMachine","User","Administrators","NonAdministrators"}] String TargetType;
+    [Write, Description("Specifies the desired state of the registry policy. When set to 'Present', the registry policy will be created. When set to 'Absent', the registry policy will be removed. Default value is 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+};
