@@ -8,20 +8,13 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_Folder'
 
 <#
     .SYNOPSIS
-        Returns the current state of the folder.
+        Returns the current state of the registry policy file.
 
-    .PARAMETER Path
-        The path to the folder to retrieve.
+    .PARAMETER Key
+        Indicates the path of the registry key for which you want to ensure a specific state. This path must include the hive.
 
-    .PARAMETER ReadOnly
-       If the files in the folder should be read only.
-       Not used in Get-TargetResource.
-
-    .NOTES
-        The ReadOnly parameter was made mandatory in this example to show
-        how to handle unused mandatory parameters.
-        In a real scenarion this parameter would not need to have the type
-        qualifier Required in the schema.mof.
+    .PARAMETER ValueName
+        Indicates the name of the registry value.
 #>
 function Get-TargetResource
 {
@@ -31,82 +24,52 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $Path,
+        $Key,
 
         [Parameter(Mandatory = $true)]
-        [System.Boolean]
-        $ReadOnly
+        [System.String]
+        $ValueName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","CustomPath","Account")]
+        [System.String]
+        $TargetType
     )
 
-    $getTargetResourceResult = @{
-        Ensure        = 'Absent'
-        Path          = $Path
-        ReadOnly      = $false
-        Hidden        = $false
-        Shared        = $false
-        ShareName     = $null
-    }
+    # determine pol file path
+    $polFilePath = Get-PolFilePath -TargetType $TargetType
+    # read the pol file
 
-    Write-Verbose -Message (
-        $script:localizedData.RetrieveFolder `
-            -f $Path
-    )
+    $polFileContents = Read-PolFile -Path $polFilePath
 
-    # Using -Force to find hidden folders.
-    $folder = Get-Item -Path $Path -Force -ErrorAction 'SilentlyContinue' |
-        Where-Object -FilterScript {
-            $_.PSIsContainer -eq $true
-        }
+    # determine if the key is present or not
 
-    if ($folder)
-    {
-        Write-Verbose -Message $script:localizedData.FolderFound
-
-        $isReadOnly = Test-FileAttribute -Folder $folder -Attribute 'ReadOnly'
-        $isHidden = Test-FileAttribute -Folder $folder -Attribute 'Hidden'
-
-        $folderShare = Get-SmbShare |
-            Where-Object -FilterScript {
-            $_.Path -eq $Path
-        }
-
-        # Cast the object to Boolean.
-        $isShared = [System.Boolean] $folderShare
-        if ($isShared)
-        {
-            $shareName = $folderShare.Name
-        }
-
-        $getTargetResourceResult['Ensure'] = 'Present'
-        $getTargetResourceResult['ReadOnly'] = $isReadOnly
-        $getTargetResourceResult['Hidden'] = $isHidden
-        $getTargetResourceResult['Shared'] = $isShared
-        $getTargetResourceResult['ShareName'] = $shareName
-    }
-    else
-    {
-        Write-Verbose -Message $script:localizedData.FolderNotFound
-    }
+    # return the results
 
     return $getTargetResourceResult
 }
 
 <#
     .SYNOPSIS
-        Creates or removes the folder.
+        Adds or removes the policy key in the pol file.
 
-    .PARAMETER Path
-        The path to the folder to retrieve.
+    .PARAMETER Key
+        Indicates the path of the registry key for which you want to ensure a specific state. This path must include the hive.
 
-    .PARAMETER ReadOnly
-       If the files in the folder should be read only.
-       Not used in Get-TargetResource.
+    .PARAMETER ValueName
+        Indicates the name of the registry value.
 
-    .PARAMETER Hidden
-        If the folder attribut should be hidden. Default value is $false.
+    .PARAMETER ValueData
+        The data for the registry value.
+
+    .PARAMETER ValueType
+        Indicates the type of the value.
+
+    .PARAMETER TargetType
+        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, CustomPath, Account.
 
     .PARAMETER Ensure
-        Specifies the desired state of the folder. When set to 'Present', the folder will be created. When set to 'Absent', the folder will be removed. Default value is 'Present'.
+        Specifies the desired state of the registry policy. When set to 'Present', the registry policy will be created. When set to 'Absent', the registry policy will be removed. Default value is 'Present'.
 #>
 function Set-TargetResource
 {
@@ -115,15 +78,25 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $Path,
+        $Key,
 
         [Parameter(Mandatory = $true)]
-        [System.Boolean]
-        $ReadOnly,
+        [System.String]
+        $ValueName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","CustomPath","Account")]
+        [System.String]
+        $TargetType,
 
         [Parameter()]
-        [System.Boolean]
-        $Hidden,
+        [System.String]
+        $ValueData,
+
+        [Parameter()]
+        [ValidateSet("Binary","Dword","ExpandString","MultiString","Qword","String","None")]
+        [System.String]
+        $ValueType,
 
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
@@ -178,20 +151,25 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-        Creates or removes the folder.
+        Tests for the desired state of the policy key in the pol file.
 
-    .PARAMETER Path
-        The path to the folder to retrieve.
+    .PARAMETER Key
+        Indicates the path of the registry key for which you want to ensure a specific state. This path must include the hive.
 
-    .PARAMETER ReadOnly
-       If the files in the folder should be read only.
-       Not used in Get-TargetResource.
+    .PARAMETER ValueName
+        Indicates the name of the registry value.
 
-    .PARAMETER Hidden
-        If the folder attribut should be hidden. Default value is $false.
+    .PARAMETER ValueData
+        The data for the registry value.
+
+    .PARAMETER ValueType
+        Indicates the type of the value.
+
+    .PARAMETER TargetType
+        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators.
 
     .PARAMETER Ensure
-        Specifies the desired state of the folder. When set to 'Present', the folder will be created. When set to 'Absent', the folder will be removed. Default value is 'Present'.
+        Specifies the desired state of the registry policy. When set to 'Present', the registry policy will be created. When set to 'Absent', the registry policy will be removed. Default value is 'Present'.
 #>
 function Test-TargetResource
 {
@@ -201,15 +179,29 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $Path,
+        $Key,
 
         [Parameter(Mandatory = $true)]
-        [System.Boolean]
-        $ReadOnly,
+        [System.String]
+        $ValueName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","CustomPath","Account")]
+        [System.String]
+        $TargetType,
 
         [Parameter()]
-        [System.Boolean]
-        $Hidden,
+        [System.String]
+        $ValueData,
+
+        [Parameter()]
+        [System.String]
+        $CustomPath,
+
+        [Parameter()]
+        [ValidateSet("Binary","Dword","ExpandString","MultiString","Qword","String","None")]
+        [System.String]
+        $ValueType,
 
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
@@ -254,92 +246,221 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-        Test if an attribute on a folder is present.
+        Reads and parses a .pol file.
 
-    .PARAMETER Folder
-        The System.IO.DirectoryInfo object of the folder that should be checked
-        for the attribute.
+    .DESCRIPTION
+            Reads a .pol file, parses it and returns an array of Group Policy registry settings.
 
-    .PARAMETER Attribute
-        The name of the attribute from the enum System.IO.FileAttributes.
+    .PARAMETER Path
+        Specifies the path to the .pol file.
+
+    .EXAMPLE
+        C:\PS> Parse-PolFile -Path "C:\Registry.pol"
 #>
-function Test-FileAttribute
+function Read-PolFile
 {
-    [CmdletBinding()]
-    [OutputType([System.Boolean])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [System.IO.DirectoryInfo]
-        $Folder,
-
-        [Parameter(Mandatory = $true)]
-        [System.IO.FileAttributes]
-        $Attribute
+    [OutputType([Array])]
+    param (
+        [Parameter(Mandatory=$true,Position=0)]
+        [string]
+        $Path
     )
 
-    $attributeValue = $Folder.Attributes -band [System.IO.FileAttributes]::$Attribute
+    [Array] $RegistryPolicies = @()
+    $index = 0
 
-    switch ($attributeValue)
+    [string] $policyContents = Get-Content $Path -Raw
+    [byte[]] $policyContentInBytes = Get-Content $Path -Raw -Encoding Byte
+
+    # 4 bytes are the signature PReg
+    $signature = [System.Text.Encoding]::ASCII.GetString($policyContents[0..3])
+    $index += 4
+    Assert ($signature -eq 'PReg') ($LocalizedData.InvalidHeader -f $Path)
+
+    # 4 bytes are the version
+    $version = [System.BitConverter]::ToInt32($policyContentInBytes, 4)
+    $index += 4
+    Assert ($version -eq 1) ($LocalizedData.InvalidVersion -f $Path)
+
+    # Start processing at byte 8
+    while($index -lt $policyContents.Length - 2)
     {
-        { $_ -gt 0 }
+        [string]$keyName = $null
+        [string]$valueName = $null
+        [int]$valueType = $null
+        [int]$valueLength = $null
+
+        [object]$value = $null
+
+        # Next UNICODE character should be a [
+        $leftbracket = [System.BitConverter]::ToChar($policyContentInBytes, $index)
+        Assert ($leftbracket -eq '[') "Missing the openning bracket"
+        $index+=2
+
+        # Next UNICODE string will continue until the ; less the null terminator
+        $semicolon = $policyContents.IndexOf(";", $index)
+        Assert ($semicolon -ge 0) "Failed to locate the semicolon after key name."
+        $keyName = [System.Text.Encoding]::UNICODE.GetString($policyContents[($index)..($semicolon-3)]) # -3 to exclude the null termination and ';' characters
+        $index = $semicolon + 2
+
+        # Next UNICODE string will continue until the ; less the null terminator
+        $semicolon = $policyContents.IndexOf(";", $index)
+        Assert ($semicolon -ge 0) "Failed to locate the semicolon after value name."
+        $valueName = [System.Text.Encoding]::UNICODE.GetString($policyContents[($index)..($semicolon-3)]) # -3 to exclude the null termination and ';' characters
+        $index = $semicolon + 2
+
+        # Next DWORD will continue until the ;
+        $semicolon = $index + 4 # DWORD Size
+        Assert ([System.BitConverter]::ToChar($policyContentInBytes, $semicolon) -eq ';') "Failed to locate the semicolon after value type."
+        $valueType = [System.BitConverter]::ToInt32($policyContentInBytes, $index)
+        $index=$semicolon + 2 # Skip ';'
+
+        # Next DWORD will continue until the ;
+        $semicolon = $index + 4 # DWORD Size
+        Assert ([System.BitConverter]::ToChar($policyContentInBytes, $semicolon) -eq ';') "Failed to locate the semicolon after value length."
+        $valueLength = Convert-StringToInt -ValueString $policyContentInBytes[$index..($index+3)]
+        $index=$semicolon + 2 # Skip ';'
+
+        if ($valueLength -gt 0)
         {
-            $isPresent = $true
+            # String types less the null terminator for REG_SZ and REG_EXPAND_SZ
+            # REG_SZ: string type (ASCII)
+            if($valueType -eq [RegType]::REG_SZ)
+            {
+                [string] $value = [System.Text.Encoding]::UNICODE.GetString($policyContents[($index)..($index+$valueLength-3)]) # -3 to exclude the null termination and ']' characters
+                $index += $valueLength
+            }
+
+            # REG_EXPAND_SZ: string, includes %ENVVAR% (expanded by caller) (ASCII)
+            if($valueType -eq [RegType]::REG_EXPAND_SZ)
+            {
+                [string] $value = [System.Text.Encoding]::UNICODE.GetString($policyContents[($index)..($index+$valueLength-3)]) # -3 to exclude the null termination and ']' characters
+                $index += $valueLength
+            }
+
+            # For REG_MULTI_SZ leave the last null terminator
+            # REG_MULTI_SZ: multiple strings, delimited by \0, terminated by \0\0 (ASCII)
+            if($valueType -eq [RegType]::REG_MULTI_SZ)
+            {
+                [string] $value = [System.Text.Encoding]::UNICODE.GetString($policyContents[($index)..($index+$valueLength-3)])
+                $index += $valueLength
+            }
+
+            # REG_BINARY: binary values
+            if($valueType -eq [RegType]::REG_BINARY)
+            {
+                [byte[]] $value = $policyContentInBytes[($index)..($index+$valueLength-1)]
+                $index += $valueLength
+            }
         }
 
-        default
+        # DWORD: (4 bytes) in little endian format
+        if($valueType -eq [RegType]::REG_DWORD)
         {
-            $isPresent = $false
+            $value = Convert-StringToInt -ValueString $policyContentInBytes[$index..($index+3)]
+            $index += 4
         }
+
+        # QWORD: (8 bytes) in little endian format
+        if($valueType -eq [RegType]::REG_QWORD)
+        {
+            $value = Convert-StringToInt -ValueString $policyContentInBytes[$index..($index+7)]
+            $index += 8
+        }
+
+        # Next UNICODE character should be a ]
+        $rightbracket = $policyContents.IndexOf("]", $index) # Skip over null data value if one exists
+        Assert ($rightbracket -ge 0) "Missing the closing bracket."
+        $index = $rightbracket + 2
+
+        $entry = New-GPRegistryPolicy $keyName $valueName $valueType $valueLength $value
+
+        $RegistryPolicies += $entry
     }
 
-    return $isPresent
+    return $RegistryPolicies
 }
 
 <#
     .SYNOPSIS
-        Sets or removes an attribute on a folder.
+        Retrieves the path to the pol file.
 
-    .PARAMETER Folder
-        The System.IO.DirectoryInfo object of the folder that should have the
-        attribute set or removed.
+    .PARAMETER TargetType
+        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, CustomPath, Account.
 
-    .PARAMETER Attribute
-       The name of the attribute from the enum System.IO.FileAttributes.
-
-    .PARAMETER Enabled
-       If the attribute should be enabled or disabled.
 #>
-function Set-FileAttribute
+function Get-PolFilePath
 {
     [CmdletBinding()]
-    [OutputType([System.IO.DirectoryInfo])]
+    [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory = $true)]
-        [System.IO.DirectoryInfo]
-        $Folder,
-
-        [Parameter(Mandatory = $true)]
-        [System.IO.FileAttributes]
-        $Attribute,
-
-        [Parameter(Mandatory = $true)]
-        [System.Boolean]
-        $Enabled
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","CustomPath","Account")]
+        [System.String]
+        $TargetType
     )
 
-    switch ($Enabled)
+    # "LocalMachine","UserConfiguration","Administrators","NonAdministrators","CustomPath"
+
+    switch ($TargetType)
     {
-        $true
+        'ComputerConfiguration'
         {
-            $Folder.Attributes = [System.IO.FileAttributes]::$Attribute
-
+            $childPath = 'System32\GroupPolicy\Machine\registry.pol'
         }
-
-        $false
+        'UserConfiguration'
         {
-            $Folder.Attributes -= [System.IO.FileAttributes]::$Attribute
+            $childPath = 'System32\GroupPolicy\User\registry.pol'
+        }
+        'Administrators'
+        {
+            $childPath = 'System32\GroupPolicyUsers\S-1-5-32-544\User\registry.pol'
+        }
+        'NonAdministrators'
+        {
+            $childPath = 'System32\GroupPolicyUsers\S-1-5-32-545\User\registry.pol'
+        }
+        'Account'
+        {
+            $sid = ConvertTo-SecurityIdentifer -AccountName $AccountName
+            $childPath = "System32\GroupPolicyUsers\$sid\User\registry.pol"
         }
     }
+
+    return (Join-Path -Path $env:SystemRoot -ChildPath $childPath)
+}
+
+<#
+    .SYNOPSIS
+        Converts an identity to a SID to verify it's a valid account
+
+    .PARAMETER Identity
+        Specifies the identity to convert
+#>function ConvertTo-SecurityIdentifer
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [System.String]
+        $AccountName
+    )
+
+    $id = [System.Security.Principal.NTAccount]$AccountName
+
+    try
+    {
+        $result = $id.Translate([System.Security.Principal.SecurityIdentifier]).Value
+    }
+    catch
+    {
+       # Write-Verbose -Message ($script:localizedData.ErrorIdToSid -f $Identity)
+
+        throw $_ #"$($script:localizedData.ErrorIdToSid -f $Identity)"
+
+    }
+
+    return $result
 }
