@@ -480,7 +480,7 @@ function New-NotImplementedException
     throw $errorRecordToThrow
 }
 
-$script:localizedData = Get-LocalizedData -ResourceName 'DscResource.Common' -ScriptRoot $PSScriptRoot
+$script:localizedData = Get-LocalizedData -ResourceName 'GPRegistryPolicyDsc.Common' -ScriptRoot $PSScriptRoot
 
 Export-ModuleMember -Function @(
     'Test-DscParameterState',
