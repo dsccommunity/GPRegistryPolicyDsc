@@ -15,6 +15,9 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_RegistryPolicyFile
 
     .PARAMETER ValueName
         Indicates the name of the registry value.
+
+    .PARAMETER AccountName
+        Specifies the name of the account for an user specific pol file to be managed.
 #>
 function Get-TargetResource
 {
@@ -33,11 +36,15 @@ function Get-TargetResource
         [Parameter(Mandatory=$true)]
         [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","Account")]
         [System.String]
-        $TargetType
+        $TargetType,
+
+        [Parameter()]
+        [System.String]
+        $AccountName
     )
 
     # determine pol file path
-    $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType
+    $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType -AccountName $AccountName
     $assertPolFile = Test-Path -Path $polFilePath
     # read the pol file
     if ($assertPolFile -eq $true)
@@ -102,7 +109,10 @@ function Get-TargetResource
         Indicates the type of the value.
 
     .PARAMETER TargetType
-        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, CustomPath, Account.
+        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, Account.
+    
+    .PARAMETER AccountName
+        Specifies the name of the account for an user specific pol file to be managed.
 
     .PARAMETER Ensure
         Specifies the desired state of the registry policy. When set to 'Present', the registry policy will be created. When set to 'Absent', the registry policy will be removed. Default value is 'Present'.
@@ -121,7 +131,7 @@ function Set-TargetResource
         $ValueName,
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","Account")]
+        [ValidateSet('ComputerConfiguration','UserConfiguration','Administrators','NonAdministrators','Account')]
         [System.String]
         $TargetType,
 
@@ -130,9 +140,13 @@ function Set-TargetResource
         $ValueData,
 
         [Parameter()]
-        [ValidateSet("Binary","Dword","ExpandString","MultiString","Qword","String","None")]
+        [ValidateSet('Binary','Dword','ExpandString','MultiString','Qword','String','None')]
         [System.String]
         $ValueType,
+
+        [Parameter()]
+        [System.String]
+        $AccountName,
 
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
@@ -153,7 +167,7 @@ function Set-TargetResource
         if ($getTargetResourceResult.Ensure -eq 'Absent')
         {
             # test if pol file exists
-            $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType
+            $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType -AccountName $AccountName
 
             # if it doesn't exist create it
             $assertPolFile = Test-Path -Path $polFilePath
@@ -166,8 +180,8 @@ function Set-TargetResource
         }
         # write the desired value
         # ToDo Write-Verbose
-        $gpRegistryEntry = New-GPRegistrySettingsEntry -Key $Key -ValueName $ValueName -ValueData $ValueData -ValueType $ValueType
-        Append-GPRegistrySettingsEntry -Path $polFilePath -RegistryPolicyEntry $gpRegistryEntry
+        $gpRegistryEntry = New-GPRegistryPolicy -Key $Key -ValueName $ValueName -ValueData $ValueData -ValueType $ValueType
+        Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $gpRegistryEntry
     }
     else
     {
@@ -177,7 +191,7 @@ function Set-TargetResource
                 $script:localizedData.RemoveFolder -f $Path
             )
 
-            Remove-Item -Path $Path -Force -ErrorAction Stop
+            Remove-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $gpRegistryEntry
         }
     }
 }
@@ -199,7 +213,10 @@ function Set-TargetResource
         Indicates the type of the value.
 
     .PARAMETER TargetType
-        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators.
+        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, Account.
+    
+    .PARAMETER AccountName
+        Specifies the name of the account for an user specific pol file to be managed.
 
     .PARAMETER Ensure
         Specifies the desired state of the registry policy. When set to 'Present', the registry policy will be created. When set to 'Absent', the registry policy will be removed. Default value is 'Present'.
@@ -219,7 +236,7 @@ function Test-TargetResource
         $ValueName,
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","Account")]
+        [ValidateSet('ComputerConfiguration','UserConfiguration','Administrators','NonAdministrators','Account')]
         [System.String]
         $TargetType,
 
@@ -228,9 +245,13 @@ function Test-TargetResource
         $ValueData,
 
         [Parameter()]
-        [ValidateSet("Binary","Dword","ExpandString","MultiString","Qword","String","None")]
+        [ValidateSet('Binary','Dword','ExpandString','MultiString','Qword','String','None')]
         [System.String]
         $ValueType,
+
+        [Parameter()]
+        [System.String]
+        $AccountName,
 
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
@@ -261,10 +282,7 @@ function Test-TargetResource
             'Ensure'
         )
 
-        $testTargetResourceResult = Test-DscParameterState `
-            -CurrentValues $getTargetResourceResult `
-            -DesiredValues $PSBoundParameters `
-            -ValuesToCheck $valuesToCheck
+        $testTargetResourceResult = Test-DscParameterState -CurrentValues $getTargetResourceResult -DesiredValues $PSBoundParameters -ValuesToCheck $valuesToCheck
     }
     else
     {
@@ -282,7 +300,7 @@ function Test-TargetResource
         Retrieves the path to the pol file.
 
     .PARAMETER TargetType
-        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, CustomPath, Account.
+        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, Account.
 
 #>
 function Get-GPRegistryPolicyFile
@@ -292,13 +310,17 @@ function Get-GPRegistryPolicyFile
     param
     (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","CustomPath","Account")]
+        [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","Account")]
         [System.String]
-        $TargetType
+        $TargetType,
+
+        [Parameter()]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [System.String]
+        $AccountName
     )
 
-    # ToDo - do I need to do anything for CustomPath here?
-    
     switch ($TargetType)
     {
         'ComputerConfiguration'
@@ -385,6 +407,9 @@ function ConvertTo-NTAccountName
 }
 
 #region from GpRegistryPolicy
+$script:REGFILE_SIGNATURE = 0x67655250 # PRef
+$script:REGISTRY_FILE_VERSION = 0x00000001 #Initially defined as 1, then incremented each time the file format is changed.
+
 <#
     .SYNOPSIS
         Reads and parses a .pol file.
@@ -603,14 +628,17 @@ function New-GPRegistryPolicy
 #>
 function New-GPRegistryPolicyFile
 {
-    param (
-        [Parameter(Mandatory)]
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]
         $Path
     )
 
-    $null = Remove-Item -Path $Path -Force -Verbose -ErrorAction SilentlyContinue
+    $null = Remove-Item -Path $Path -Force -ErrorAction SilentlyContinue
 
-    New-Item -Path $Path -Force -Verbose -ErrorAction Stop | Out-Null
+    New-Item -Path $Path -Force -ErrorAction Stop | Out-Null
 
     [System.BitConverter]::GetBytes($script:REGFILE_SIGNATURE) | Add-Content -Path $Path -Encoding Byte
     [System.BitConverter]::GetBytes($script:REGISTRY_FILE_VERSION) | Add-Content -Path $Path -Encoding Byte
@@ -629,123 +657,180 @@ function New-GPRegistryPolicyFile
 function New-GPRegistrySettingsEntry
 {
     [CmdletBinding()]
-    [OutputType([Array])]
-    param
-    (
-        [Parameter(Mandatory=$true,Position=0)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $Key,
-        
-        [Parameter(Position=1)]
-        [string]
-        $ValueName = $null,
-        
-        [Parameter(Position=2)]
-        [RegType]
-        $ValueType = [RegType]::REG_NONE,
-        
-        [Parameter(Position=4)]
-        [object]
-        $ValueData = $null
-    )
-
-    [Byte[]] $entry = @()
-
-    # openning bracket
-    $entry += [System.Text.Encoding]::Unicode.GetBytes('[')
-        
-    $entry += [System.Text.Encoding]::Unicode.GetBytes($Key + "`0")
-
-    # semicolon as delimiter
-    $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
-
-    $entry += [System.Text.Encoding]::Unicode.GetBytes($ValueName + "`0")
-
-    # semicolon as delimiter
-    $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
-
-    $entry += [System.BitConverter]::GetBytes([Int32]$ValueType)
-
-    # semicolon as delimiter
-    $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
-
-    # get data bytes then compute byte size based on data and type
-    switch ($ValueType)
-    {
-        { @([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ, [RegType]::REG_MULTI_SZ) -contains $_ }
-        {
-            $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($ValueData + "`0")
-            $dataSize = $dataBytes.Count
-        }
-
-        ([RegType]::REG_BINARY)
-        {
-            $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($ValueData)
-            $dataSize = $dataBytes.Count
-        }
-
-        ([RegType]::REG_DWORD)
-        {
-            $dataBytes = [System.BitConverter]::GetBytes([Int32]$ValueData)
-            $dataSize = 4
-        }
-
-        ([RegType]::REG_QWORD)
-        {
-            $dataBytes = [System.BitConverter]::GetBytes([Int64]$ValueData)
-            $dataSize = 8
-        }
-
-        default
-        {
-            $dataBytes = [System.Text.Encoding]::Unicode.GetBytes("")
-            $dataSize = 0
-        }
-    }
-
-    $entry += [System.BitConverter]::GetBytes($dataSize)
-
-    # semicolon as delimiter
-    $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
-
-    $entry += $dataBytes
-
-    # closing bracket
-    $entry += [System.Text.Encoding]::Unicode.GetBytes(']')
-
-    return $entry
-}
-
-<# 
-    .SYNOPSIS
-        Appends an array of registry policy entries to a file.
-
-    .PARAMETER RegistryPolicies
-        An array of registry policy entries.
-
-    .PARAMETER Path
-        Path to a file (.pol extension)
-#>
-function Append-GPRegistrySettingsEntry
-{
+    [OutputType([byte[]])]
     param
     (
         [Parameter(Mandatory = $true)]
         [GPRegistryPolicy[]]
-        $RegistryPolicyEntry,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [System.String]
-        $Path
+        $RegistryPolicy
     )
 
-    foreach ($policyEntry in $RegistryPolicyEntry)
+    [byte[]] $entry = @()
+    foreach ($policy in $RegistryPolicy)
     {
-        [Byte[]] $entry = New-GPRegistrySettingsEntry -RegistryPolicy $policyEntry
-        $entry | Add-Content -Path $Path -Encoding Byte
+        
+
+        # openning bracket
+        $entry += [System.Text.Encoding]::Unicode.GetBytes('[')
+        $entry += [System.Text.Encoding]::Unicode.GetBytes($policy.Key + "`0")
+
+        # semicolon as delimiter
+        $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
+        $entry += [System.Text.Encoding]::Unicode.GetBytes($policy.ValueName + "`0")
+
+        # semicolon as delimiter
+        $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
+        $entry += [System.BitConverter]::GetBytes([Int32]$policy.ValueType)
+
+        # semicolon as delimiter
+        $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
+
+        # get data bytes then compute byte size based on data and type
+        switch ($policy.ValueType)
+        {
+            {@([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ, [RegType]::REG_MULTI_SZ) -contains $_}
+            {
+                $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($policy.ValueData + "`0")
+                $dataSize = $dataBytes.Count
+            }
+
+            ([RegType]::REG_BINARY)
+            {
+                $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($policy.ValueData)
+                $dataSize = $dataBytes.Count
+            }
+
+            ([RegType]::REG_DWORD)
+            {
+                $dataBytes = [System.BitConverter]::GetBytes([Int32]$policy.ValueData)
+                $dataSize = 4
+            }
+
+            ([RegType]::REG_QWORD)
+            {
+                $dataBytes = [System.BitConverter]::GetBytes([Int64]$policy.ValueData)
+                $dataSize = 8
+            }
+
+            default
+            {
+                $dataBytes = [System.Text.Encoding]::Unicode.GetBytes("")
+                $dataSize = 0
+            }
+        }
+
+        $entry += [System.BitConverter]::GetBytes($dataSize)
+
+        # semicolon as delimiter
+        $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
+        $entry += $dataBytes
+
+        # closing bracket
+        $entry += [System.Text.Encoding]::Unicode.GetBytes(']')
     }
+    return $entry
+}
+
+function Set-GPRegistryPolicyFileEntry
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory=$true)]
+        [GPRegistryPolicy]
+        $RegistryPolicy
+    )
+
+    $desiredEntries = @()
+    $currentPolicies = Read-GPRegistryPolicyFile -Path $Path
+
+    # first check if a entry exists with same key
+    $matchingEntries = $currentPolicies | Where-Object -FilterScript {$PSItem.Key -eq $RegistryPolicy.Key -and $PSItem.ValueName -eq $RegistryPolicy.ValueName}
+
+    # if found compare it current policies to validate no duplicate entries
+    if ($matchingEntries)
+    {
+        # compare value data
+        foreach ($policy in $matchingEntries)
+        {
+            if ($policy.ValueData -eq $RegistryPolicy.ValueData)
+            {
+                "Entry already exists in a desired state"
+                return
+            }
+            # ToDo verbose message displaying values
+        }
+    }
+
+    # at this point we have validated the desired entry doesn't match any of the current entries so we can add it to existing entries
+    $desiredEntries += $currentPolicies | Where-Object -FilterScript {$PSItem.Key -ne $RegistryPolicy.Key -or $PSItem.ValueName -ne $RegistryPolicy.ValueName}
+    $desiredEntries += $RegistryPolicy
+
+    # convert entries to byte array
+    $desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
+
+    if ($PSVersionTable.PSEdition -eq 'Core')
+    {
+        $encodingParameter = @{AsByteStream = $true}
+    }
+    else
+    {
+        $encodingParameter = @{Encoding = 'Byte'}
+    }
+
+    New-GPRegistryPolicyFile -Path $Path
+    $desiredEntriesCollection | Add-Content -Path $Path -Force @encodingParameter
+}
+
+function Remove-GPRegistryPolicyFileEntry
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory=$true)]
+        [GPRegistryPolicy]
+        $RegistryPolicy
+    )
+
+    # read pol file
+    $currentPolicies = Read-GPRegistryPolicyFile -Path $Path
+
+    # first check if a entry exists with same key
+    $matchingEntries = $currentPolicies | Where-Object -FilterScript {$PSItem.Key -eq $RegistryPolicy.Key -and $PSItem.ValueName -eq $RegistryPolicy.ValueName}
+
+    # validate entry exists before removing it.
+    if ($null -eq $matchingEntries)
+    {
+        # ToDo
+        Write-Verbose "No matching entries found"
+        return
+    }
+
+    $desiredEntries = $currentPolicies | Where-Object -FilterScript {$PSItem.Key -ne $RegistryPolicy.Key -or $PSItem.ValueName -ne $RegistryPolicy.ValueName}
+
+    # convert entries to byte array
+    $desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
+
+    # write entries to file
+    if ($PSVersionTable.PSEdition -eq 'Core')
+    {
+        $encodingParameter = @{AsByteStream = $true}
+    }
+    else
+    {
+        $encodingParameter = @{Encoding = 'Byte'}
+    }
+
+    New-GPRegistryPolicyFile -Path $Path
+    $desiredEntriesCollection | Add-Content -Path -Force $Path @encodingParameter
 }
 
 function Convert-StringToInt
