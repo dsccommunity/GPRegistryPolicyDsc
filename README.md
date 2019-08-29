@@ -1,6 +1,8 @@
 # GPRegistryPolicyDsc
 
-This resource module contains resources used to apply local group policies by modifying .pol files.
+This resource module contains resources used to apply and manage local group policies by modifying the respective .pol file.
+
+This module adapted code from [GPRegistryPolicy](https://github.com/PowerShell/GPRegistryPolicy).
 
 This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
