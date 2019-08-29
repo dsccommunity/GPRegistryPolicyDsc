@@ -162,6 +162,7 @@ function Set-TargetResource
 
     $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
     $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType -AccountName $AccountName
+    $gpRegistryEntry = New-GPRegistryPolicy -Key $Key -ValueName $ValueName -ValueData $ValueData -ValueType ([GPRegistryPolicy]::GetRegTypeFromString($ValueType))
 
     if ($Ensure -eq 'Present')
     {
@@ -179,7 +180,6 @@ function Set-TargetResource
         }
         # write the desired value
         # ToDo Write-Verbose
-        $gpRegistryEntry = New-GPRegistryPolicy -Key $Key -ValueName $ValueName -ValueData $ValueData -ValueType ([GPRegistryPolicy]::GetRegTypeFromString($ValueType))
         Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $gpRegistryEntry
     }
     else
@@ -190,7 +190,6 @@ function Set-TargetResource
             Write-Verbose -Message (
                 $script:localizedData.RemoveFolder -f $Path
             )
-
             Remove-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $gpRegistryEntry
         }
     }
