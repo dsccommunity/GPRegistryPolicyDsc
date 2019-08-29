@@ -1,12 +1,6 @@
-# DscResource.Template
+# GPRegistryPolicyDsc
 
-The **DscResource.Template** module contains a template with example code and
-best practices for DSC resource modules in
-[DSC Resource Kit](https://github.com/PowerShell/DscResources).
-
->**NOTE!** This is not meant to be a fully functioning resource module.
->The resource in this repository is just to make sure common code works,
->and used as a practical example.
+This resource module contains resources used to apply local group policies by modifying .pol files.
 
 This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
@@ -48,14 +42,14 @@ To install from the PowerShell gallery using PowerShellGet (in PowerShell 5.0)
 run the following command:
 
 ```powershell
-Find-Module -Name DscResource.Template -Repository PSGallery | Install-Module
+Find-Module -Name GPRegistryPolicyDsc -Repository PSGallery | Install-Module
 ```
 
 To confirm installation, run the below command and ensure you see the
 DSC resources available:
 
 ```powershell
-Get-DscResource -Module DscResource.Template
+Get-DscResource -Module GPRegistryPolicyDsc
 ```
 
 ## Requirements
@@ -74,13 +68,12 @@ A full list of changes in each version can be found in the [change log](CHANGELO
 
 ## Resources
 
-* [**Folder**](#folder) example resource
-  to manage a folder on Windows.
+* [**RegistryPolicyFile**](#RegistryPolicyFile) A resource to manage registry policy entries in a policy (.pol) file.
 * {**Resource2** One line description of resource 1}
 
-### Folder
+### RegistryPolicyFile
 
-Example resource to manage a folder on Windows.
+A resource to manage registry policy entries in a policy (.pol) file.
 
 #### Requirements
 
@@ -88,54 +81,26 @@ Example resource to manage a folder on Windows.
 
 #### Parameters
 
-* **`[String]` Path** _(Key)_: The path to the folder to create.
-* **`[Boolean]` ReadOnly** _(Required)_: If the files in the folder should be
-  read only.
-* **`[Boolean]` Hidden** _(Write)_: If the folder should be hidden.
-  Default value is `$false`.
-* **`[String]` Ensure** _(Write)_: Specifies the desired state of the folder.
-     When set to `'Present'`, the folder will be created. When set to `'Absent'`,
-    the folder will be removed. Default value is `'Present'`.
+* **`[String]` Key** _(Key)_: TIndicates the path of the registry key for which you want to ensure a specific state.
+* **`[String]` ValueName** _(Required)_: Indicates the name of the registry value.
+* **`[String]` TargetType** _(Required)_: Indicates the target type. This is needed to determine the .pol file path. Supported values are ComputerConfiguration, UserConfiguration, Administrators, NonAdministrators, and Account.
+* **`[String]` AccountName** _(Write)_: Specifies the name of the account for an user specific pol file to be managed.
+* **`[String]` ValueData** _(Write)_: The data for the registry value.
+* **`[String]` ValueType** _(Write)_: Indicates the type of the value.
+* **`[String]` Ensure** _(Write)_: Specifies the desired state of the registry policy.
+     When set to `'Present'`, the registry policy will be created. When set to `'Absent'`,
+    the registry policy will be removed. Default value is `'Present'`.
 
 #### Read-Only Properties from Get-TargetResource
 
-* **`[Boolean]` Shared** _(Write)_: If sharing is be enabled or disabled.
-* **`[String]` ShareName** _(Read)_: The name of the shared resource.
+* **`[String]` Path** _(Read)_: Specifies the path to the pol file being managed.
 
 #### Examples
 
-* [Create folder as SYSTEM](/Examples/Resources/Folder/1-DscResourceTemplate_CreateFolderAsSystemConfig.ps1)
+* [Disable SMB1](/Examples/Resources/RegistryPolicyFile/1-RegistryPolicyFile_DisableSmb1.ps1)
 * [Create folder as user](/Examples/Resources/Folder/2-DscResourceTemplate_CreateFolderAsUserConfig.ps1)
 * [Remove folder](/Examples/Resources/Folder/3-DscResourceTemplate_RemoveFolderConfig.ps1)
 
 #### Known issues
 
-All issues are not listed here, see [here for all open issues](https://github.com/PowerShell/DscResource.Template/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+Folder).
-
-### {ResourceName}
-
-{ Detailed description of ResourceName. }
-
-#### Requirements
-
-{ Please include any requirements for running this resource (e.g. Must
-run on Windows Server OS, must have Exchange already installed). }
-
-* Target machine must be running Windows Server 2008 R2 or later.
-
-#### Parameters
-
-* {**`[String]` Property1** _(Key)_: Description of ResourceName property 1}
-* {**`[Boolean]` Property2** _(Required)_: Description of ResourceName property 2}
-
-#### Read-Only Properties from Get-TargetResource
-
-* {**`[Boolean]` Property3** _(Write)_: Description of ResourceName property 2}
-
-#### Examples
-
-* { Add links to the examples for the resource ResourceName }
-
-#### Known issues
-
-All issues are not listed here, see [here for all open issues](https://github.com/PowerShell/DscResource.Template/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+ResourceName).
+All issues are not listed here, see [here for all open issues](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues?utf8=✓&q=is%3Aissue+is%3Aopen+RegistryPolicyFile).
