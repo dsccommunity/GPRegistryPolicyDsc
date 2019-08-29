@@ -1,6 +1,5 @@
 $script:resourceModulePath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
 $script:modulesFolderPath = Join-Path -Path $script:resourceModulePath -ChildPath 'Modules'
-
 $script:resourceHelperModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'GPRegistryPolicyDsc.Common'
 Import-Module -Name (Join-Path -Path $script:resourceHelperModulePath -ChildPath 'GPRegistryPolicyDsc.Common.psm1')
 
@@ -46,6 +45,7 @@ function Get-TargetResource
     # determine pol file path
     $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType -AccountName $AccountName
     $assertPolFile = Test-Path -Path $polFilePath
+
     # read the pol file
     if ($assertPolFile -eq $true)
     {
@@ -161,14 +161,13 @@ function Set-TargetResource
     }
 
     $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
+    $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType -AccountName $AccountName
 
     if ($Ensure -eq 'Present')
     {
         if ($getTargetResourceResult.Ensure -eq 'Absent')
         {
             # test if pol file exists
-            $polFilePath = Get-GPRegistryPolicyFile -TargetType $TargetType -AccountName $AccountName
-
             # if it doesn't exist create it
             $assertPolFile = Test-Path -Path $polFilePath
             if ($assertPolFile -eq $false)
@@ -180,13 +179,14 @@ function Set-TargetResource
         }
         # write the desired value
         # ToDo Write-Verbose
-        $gpRegistryEntry = New-GPRegistryPolicy -Key $Key -ValueName $ValueName -ValueData $ValueData -ValueType $ValueType
+        $gpRegistryEntry = New-GPRegistryPolicy -Key $Key -ValueName $ValueName -ValueData $ValueData -ValueType ([GPRegistryPolicy]::GetRegTypeFromString($ValueType))
         Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $gpRegistryEntry
     }
     else
     {
         if ($getTargetResourceResult.Ensure -eq 'Present')
         {
+            # ToDo
             Write-Verbose -Message (
                 $script:localizedData.RemoveFolder -f $Path
             )
@@ -266,6 +266,7 @@ function Test-TargetResource
     }
 
     $testTargetResourceResult = $false
+    $PSBoundParameters.ValueType = [GPRegistryPolicy]::GetRegTypeFromString($ValueType)
 
     $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
 
@@ -406,6 +407,28 @@ function ConvertTo-NTAccountName
     return $identiy.Translate([System.Security.Principal.NTAccount]).Value
 }
 
+function Get-ByteStreamParameter
+{
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param ()
+
+    if ($PSVersionTable.PSEdition -eq 'Core')
+    {
+        return @{AsByteStream = $true}
+    }
+
+    return @{Encoding = 'Byte'}
+}
+
+function Invoke-GPRegistryUpdate
+{
+    [CmdletBinding()]
+    param ()
+
+    Start-Process -FilePath gpupdate.exe -ArgumentList '/force' -Wait -NoNewWindow
+}
+
 #region from GpRegistryPolicy
 $script:REGFILE_SIGNATURE = 0x67655250 # PRef
 $script:REGISTRY_FILE_VERSION = 0x00000001 #Initially defined as 1, then incremented each time the file format is changed.
@@ -415,7 +438,7 @@ $script:REGISTRY_FILE_VERSION = 0x00000001 #Initially defined as 1, then increme
         Reads and parses a .pol file.
 
     .DESCRIPTION
-            Reads a .pol file, parses it and returns an array of Group Policy registry settings.
+        Reads a .pol file, parses it and returns an array of Group Policy registry settings.
 
     .PARAMETER Path
         Specifies the path to the .pol file.
@@ -661,6 +684,7 @@ function New-GPRegistrySettingsEntry
     param
     (
         [Parameter(Mandatory = $true)]
+        [AllowNull()]
         [GPRegistryPolicy[]]
         $RegistryPolicy
     )
@@ -668,8 +692,6 @@ function New-GPRegistrySettingsEntry
     [byte[]] $entry = @()
     foreach ($policy in $RegistryPolicy)
     {
-        
-
         # openning bracket
         $entry += [System.Text.Encoding]::Unicode.GetBytes('[')
         $entry += [System.Text.Encoding]::Unicode.GetBytes($policy.Key + "`0")
@@ -773,16 +795,9 @@ function Set-GPRegistryPolicyFileEntry
     # convert entries to byte array
     $desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
 
-    if ($PSVersionTable.PSEdition -eq 'Core')
-    {
-        $encodingParameter = @{AsByteStream = $true}
-    }
-    else
-    {
-        $encodingParameter = @{Encoding = 'Byte'}
-    }
-
     New-GPRegistryPolicyFile -Path $Path
+
+    $encodingParameter = Get-ByteStreamParameter
     $desiredEntriesCollection | Add-Content -Path $Path -Force @encodingParameter
 }
 
@@ -816,21 +831,15 @@ function Remove-GPRegistryPolicyFileEntry
 
     $desiredEntries = $currentPolicies | Where-Object -FilterScript {$PSItem.Key -ne $RegistryPolicy.Key -or $PSItem.ValueName -ne $RegistryPolicy.ValueName}
 
-    # convert entries to byte array
-    $desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
-
     # write entries to file
-    if ($PSVersionTable.PSEdition -eq 'Core')
-    {
-        $encodingParameter = @{AsByteStream = $true}
-    }
-    else
-    {
-        $encodingParameter = @{Encoding = 'Byte'}
-    }
-
     New-GPRegistryPolicyFile -Path $Path
-    $desiredEntriesCollection | Add-Content -Path -Force $Path @encodingParameter
+
+    if ($null -ne $desiredEntries)
+    {
+        $desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
+        $encodingParameter = Get-ByteStreamParameter
+        $desiredEntriesCollection | Add-Content -Path $Path -Force @encodingParameter
+    }
 }
 
 function Convert-StringToInt
