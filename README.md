@@ -99,7 +99,7 @@ A resource to manage registry policy entries in a policy (.pol) file.
 
 #### Examples
 
-* [Disable SMB1](/Examples/Resources/RegistryPolicyFile/1-RegistryPolicyFile_DisableSmb1.ps1)
+* [Disable SMB1](/Examples/Resources/RegistryPolicyFile/1-RegistryPolicyFile_DisableSmb1Config.ps1)
 * [Create folder as user](/Examples/Resources/Folder/2-DscResourceTemplate_CreateFolderAsUserConfig.ps1)
 * [Remove folder](/Examples/Resources/Folder/3-DscResourceTemplate_RemoveFolderConfig.ps1)
 
