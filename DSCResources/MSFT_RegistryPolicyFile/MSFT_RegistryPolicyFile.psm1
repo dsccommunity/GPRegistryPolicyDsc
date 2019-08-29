@@ -194,6 +194,8 @@ function Set-TargetResource
             Remove-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $gpRegistryEntry
         }
     }
+
+    Invoke-GPRegistryUpdate
 }
 
 <#
