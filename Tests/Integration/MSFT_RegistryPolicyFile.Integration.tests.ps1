@@ -18,8 +18,8 @@
 #>
 
 # TODO: Customize these parameters...
-$script:dscModuleName = '<ModuleName>' # TODO: Example 'NetworkingDsc'
-$script:dscResourceFriendlyName = '<ResourceFriendlyName>' # TODO: Example 'Firewall'
+$script:dscModuleName = 'GPRegistryPolicyDsc' # TODO: Example 'NetworkingDsc'
+$script:dscResourceFriendlyName = 'RegistryPolicyFile' # TODO: Example 'Firewall'
 $script:dscResourceName = "MSFT_$($script:dscResourceFriendlyName)" # TODO: Update prefix
 
 #region HEADER
@@ -49,11 +49,11 @@ try
 
     Describe "$($script:dscResourceName)_Integration" {
         BeforeAll {
-            $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test"
+            $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test_Disable_SMB1"
         }
 
         # TODO: Update with the correct name of the configuration.
-        $configurationName = "$($script:dscResourceName)_<ShortDescriptiveName>_Config"
+        $configurationName = "$($script:dscResourceName)_DisableSMB1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -101,8 +101,12 @@ try
                 }
 
                 # TODO: Validate the Config was Set Correctly Here...
-                $resourceCurrentState.Ensure | Should -Be 'Present'
-                $resourceCurrentState.Property | Should -Be $ConfigurationData.AllNodes.Property1
+                $resourceCurrentState.Ensure     | Should -Be 'Present'
+                $resourceCurrentState.Key        | Should -Be $ConfigurationData.AllNodes.Key
+                $resourceCurrentState.ValueType  | Should -Be $ConfigurationData.AllNodes.ValueType
+                $resourceCurrentState.ValueData  | Should -Be $ConfigurationData.AllNodes.ValueData
+                $resourceCurrentState.TargetType | Should -Be $ConfigurationData.AllNodes.TargetType
+                $resourceCurrentState.ValueName  | Should -Be $ConfigurationData.AllNodes.ValueName
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {

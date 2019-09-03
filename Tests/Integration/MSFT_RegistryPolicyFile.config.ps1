@@ -46,12 +46,12 @@ else
     $ConfigurationData = @{
         AllNodes = @(
             @{
-                NodeName        = 'localhost'
-                CertificateFile = $env:DscPublicCertificatePath
-
-                # TODO: (Optional) Add configuration properties.
-                UserName        = 'MyInstallAccount'
-                Password        = 'MyP@ssw0rd!1'
+                NodeName   = 'localhost'
+                Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
+                TargetType = 'ComputerConfiguration'
+                ValueName  = 'SMB1'
+                ValueData  = 1
+                ValueType  = 'DWORD'
             }
         )
     }
@@ -59,24 +59,31 @@ else
 
 <#
     .SYNOPSIS
-        TODO: Add a short but clear description of what this configuration does.
-        (e.g. Enables the TCP port for Remote Desktop Connection on the profile Public.)
+        Disabled SMBv1 by adding the following administrative tempalte key:
+        SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
+        SMB1 = 1
 #>
 # TODO: Modify ResourceName and ShortDescriptiveName (e.g. MSFT_Firewall_EnableRemoteDesktopConnection_Config).
-Configuration MSFT_<ResourceName>_<ShortDescriptiveName>_Config
+Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
 {
-    # TODO: Modify ModuleName (e.g. NetworkingDsc)
-    Import-DscResource -ModuleName '<ModuleName>'
+    Import-DscResource -ModuleName 'GPRegistryPolicyDsc'
 
     node $AllNodes.NodeName
     {
         # TODO: Modify ResourceFriendlyName (e.g. Firewall).
-        <ResourceFriendlyName> 'Integration_Test'
+        RegistryPolicyFile 'Integration_Test_Disable_SMB1'
         {
             # TODO: Add resource parameters here.
-            PsDscRunAsCredential = New-Object `
-                -TypeName System.Management.Automation.PSCredential `
-                -ArgumentList @($Node.Username, (ConvertTo-SecureString -String $Node.Password -AsPlainText -Force))
+            Key = $node.Key
+            TargetType = $node.TargetType
+            ValueName = $node.ValueName
+            ValueData = $node.ValueData
+            ValueType = $node.ValueType
+        }
+
+        RefreshRegistryPolicy 'Integration_Test_RefreshAfter_SMB1'
+        {
+            Name = 'RefreshPolicyAfterDisableSMB1'
         }
     }
 }

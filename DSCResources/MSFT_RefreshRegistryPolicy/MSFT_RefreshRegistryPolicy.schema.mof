@@ -2,6 +2,6 @@
 class MSFT_RefreshRegistryPolicy : OMI_BaseResource
 {
     [Key, Description("A name to serve as the key property. It is not used during configuration.")] String Name;
-    [Read, Description("Specifies the regsitry key path indicating a group policy refresh is needed.")] String RefreshRequiredKey;
-    [Read, Description("Specifies the value of the RefreshRequired key indicating a group policy refresh is needed.")] String RefreshRequiredKeyValue;
+    [Read, Description("Specifies the value of the GPRegistryPolicy key indicating a group policy refresh is needed.")] String RefreshRequiredKey;
+    [Read, Description("Specifies the path of the RefreshRequired property indicating a group policy refresh is needed.")] String Path;
 };
