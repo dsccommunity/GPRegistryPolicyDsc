@@ -20,10 +20,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 #endregion HEADER
 
-function Invoke-TestSetup
-{
-}
-
 function Invoke-TestCleanup
 {
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
@@ -32,8 +28,6 @@ function Invoke-TestCleanup
 # Begin Testing
 try
 {
-    Invoke-TestSetup
-
     InModuleScope $script:dscResourceName {
         $mockFolderObject = $null
 
@@ -258,7 +252,7 @@ try
             }
         }
 
- Describe 'MSFT_RegistryPolicyFile\Set-TargetResource' -Tag 'Set' {
+        Describe 'MSFT_RegistryPolicyFile\Set-TargetResource' -Tag 'Set' {
             BeforeAll {
                 $defaultParameters = @{
                     Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
@@ -284,6 +278,7 @@ try
 
                 $polFilePath = "C:\Windows\System32\GroupPolicy\Machine\registry.pol"
                 Mock -CommandName Invoke-GPRegistryUpdate
+                Mock -CommandName Set-GPRefreshRegistryKey
             }
 
             BeforeEach {
@@ -303,7 +298,7 @@ try
                     Mock -CommandName Get-RegistryPolicyFilePath -ParameterFilter {
                         $TargetType -eq $setTargetResourceParameters.TargetType -and
                         $null -eq $AccountName
-                    }-Verifiable
+                    } -Verifiable
                 }
 
                 BeforeEach {
@@ -314,6 +309,7 @@ try
                     { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
 
                     Assert-MockCalled -CommandName Remove-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Set-GPRefreshRegistryKey -Exactly -Times 1 -Scope 'It'
                 }
             }
 
@@ -337,6 +333,7 @@ try
 
                     Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 1 -Scope 'It'
                     Assert-MockCalled -CommandName Set-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Set-GPRefreshRegistryKey -Exactly -Times 1 -Scope 'It'
                 }
             }
 
@@ -356,6 +353,7 @@ try
 
                     Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 0 -Scope 'It'
                     Assert-MockCalled -CommandName Set-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Set-GPRefreshRegistryKey -Exactly -Times 1 -Scope 'It'
                 }
             }
         }

@@ -1,17 +1,17 @@
 $script:resourceModulePath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
 $script:modulesFolderPath = Join-Path -Path $script:resourceModulePath -ChildPath 'Modules'
 
-$script:resourceHelperModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'DscResource.Common'
-Import-Module -Name (Join-Path -Path $script:resourceHelperModulePath -ChildPath 'DscResource.Common.psm1')
+$script:resourceHelperModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'GPRegistryPolicyDsc.Common'
+Import-Module -Name (Join-Path -Path $script:resourceHelperModulePath -ChildPath 'GPRegistryPolicyDsc.Common.psm1')
 
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_ResourceName'
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_RefreshRegistryPolicy'
 
 <#
     .SYNOPSIS
-        Returns ...
+        Returns the current state if a machine requires a group policy refresh.
 
-    .PARAMETER MandatoryParameter
-        This ...
+    .PARAMETER Name
+        A name to serve as the key property. It is not used during configuration.
 #>
 function Get-TargetResource
 {
@@ -21,28 +21,31 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $MandatoryParameter
+        $Name
     )
 
+    $path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy'
+    $key = 'RefreshRequired'
+
+    $registryKey = Get-Item -Path $path -ErrorAction SilentlyContinue
+    $refreshKeyValue = ($registryKey | Get-ItemProperty).$key
+
     # TODO: Code that returns the current state.
-    Write-Verbose -Message $script:localizedData.GetConfiguration
+    Write-Verbose -Message ($script:localizedData.RefreshRequiredValue -f $refreshKeyValue)
 
     return @{
-        Ensure                = $ensure
-        MandatoryParameter    = $value1
-        NonMandatoryParameter = $value2
+        Name                = $Name
+        Path                = $registryKey.Name
+        RefreshRequiredKey  = $refreshKeyValue
     }
 }
 
 <#
     .SYNOPSIS
-        Sets ...
+        Invokes gpupdate.exe /force to update group policy.
 
-    .PARAMETER MandatoryParameter
-        This ...
-
-    .PARAMETER NonMandatoryParameter
-        This ...
+    .PARAMETER Name
+        A name to serve as the key property. It is not used during configuration.
 #>
 function Set-TargetResource
 {
@@ -51,31 +54,22 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $MandatoryParameter,
-
-        [Parameter()]
-        [ValidateSet('Present', 'Absent')]
-        [System.String]
-        $Ensure = 'Present',
-
-        [Parameter()]
-        [System.String]
-        $NonMandatoryParameter
+        $Name
     )
 
-    # Code that sets the desired state if evaluated to not in desired state.
-    Write-Verbose -Message $script:localizedData.SetConfiguration
+    Write-Verbose -Message $script:localizedData.RefreshingGroupPolicy
+
+    Invoke-Command -ScriptBlock {gpupdate.exe /force}
+
+    Remove-Item -Path HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy -Force
 }
 
 <#
     .SYNOPSIS
-        Determines if ...
+        Reads the value of HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy\RefreshRequired to determine if a group policy refresh is required.
 
-    .PARAMETER MandatoryParameter
-        This ...
-
-    .PARAMETER NonMandatoryParameter
-        This ...
+    .PARAMETER Name
+        A name to serve as the key property. It is not used during configuration.
 #>
 function Test-TargetResource
 {
@@ -85,29 +79,20 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $MandatoryParameter,
-
-        [Parameter()]
-        [ValidateSet('Present', 'Absent')]
-        [System.String]
-        $Ensure = 'Present',
-
-        [Parameter()]
-        [System.String]
-        $NonMandatoryParameter
+        $Name
     )
-
-    Write-Verbose -Message $script:localizedData.TestConfiguration
 
     $testTargetResourceResult = $false
 
-    $getTargetResourceParameters = @{
-        MandatoryParameter = $MandatoryParameter
+    $getTargetResourceResult = Get-TargetResource -Name $Name
+
+    if ($getTargetResourceResult.RefreshRequiredKey -ne 1)
+    {
+        Write-Verbose -Message $script:localizedData.NotRefreshRequired
+        $testTargetResourceResult = $true
     }
 
-    $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
-
-    # Code that tests the desired state.
+    Write-Verbose -Message $script:localizedData.RefreshRequired
 
     return $testTargetResourceResult
 }

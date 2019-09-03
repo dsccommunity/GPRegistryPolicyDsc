@@ -195,7 +195,7 @@ function Set-TargetResource
         }
     }
 
-    Invoke-GPRegistryUpdate
+    Set-GPRefreshRegistryKey
 }
 
 <#
@@ -409,4 +409,39 @@ function ConvertTo-NTAccountName
     $identiy = [System.Security.Principal.SecurityIdentifier]$SecurityIdentifier
 
     return $identiy.Translate([System.Security.Principal.NTAccount]).Value
+}
+
+<#
+    .SYNOPSIS
+        Writes a registry key indicating a group policy refresh is required.
+
+    .PARAMETER Path
+        Specifies the value of the registry path that will contain the properties pertaining to requiring a refresh.
+
+    .PARAMETER PropertyName
+        Specifies a name for the new property.
+
+    .PARAMETER Value
+        Specifies the property value.
+#>
+function Set-GPRefreshRegistryKey
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter()]
+        [string]
+        $Path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy',
+
+        [Parameter()]
+        [string]
+        $PropertyName = 'RefreshRequired',
+
+        [Parameter()]
+        [object]
+        $Value = 1
+    )
+
+    New-Item -Path $Path -Force
+    New-ItemProperty -Path $Path -Name $PropertyName -Value $Value -Force
 }
