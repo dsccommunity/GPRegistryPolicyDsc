@@ -52,24 +52,13 @@ try
             $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test_Disable_SMB1"
         }
 
-        # TODO: Update with the correct name of the configuration.
         $configurationName = "$($script:dscResourceName)_DisableSMB1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    <#
-                        TODO: (Optional) Add any additional parameters needed
-                        for compilation of the configuration, like credentials.
-                    #>
                     $configurationParameters = @{
                         OutputPath           = $TestDrive
-                        <#
-                            TODO: The variable $ConfigurationData was dot-sourced
-                            above. (Optional) The configuration data hash table can
-                            be moved into this file as appropriate, see the
-                            integration_template.config.ps1 for more information.
-                        #>
                         ConfigurationData    = $ConfigurationData
                     }
 

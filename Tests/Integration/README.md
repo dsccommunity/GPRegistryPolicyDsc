@@ -9,7 +9,7 @@ configurations then the run order for the new integration tests should be set to
 a higher run order number than the highest run order of the dependent integration
 tests.
 
-## Folder
+## RegistryPolicyFile
 
 **Run order:** 1
 

@@ -15,7 +15,7 @@
 .PRIVATEDATA 2016-Datacenter,2016-Datacenter-Server-Core
 #>
 
-#Requires -module 'GPRegistryPolicyDsc'
+#Requires -module GPRegistryPolicyDsc
 
 <#
     .SYNOPSIS
@@ -48,7 +48,7 @@
             ValueType  = 'DWORD'
         }
 
-        RegistryPolicyFile_DisableSmb1Config @configurationParameters
+        RegistryPolicyFile_DisableSmb1_Config @configurationParameters
 
         Compiles a configuration that disables SMB1.
 
@@ -65,7 +65,7 @@
         Compiles a configuration in Azure Automation disables SMB1
         Replace the <resource-group> and <automation-account> with correct values.
 #>
-Configuration RegistryPolicyFile_DisableSmb1Config
+Configuration RegistryPolicyFile_DisableSmb1_Config
 {
     param
     (
@@ -96,7 +96,7 @@ Configuration RegistryPolicyFile_DisableSmb1Config
         $ValueType
     )
 
-    Import-DscResource -ModuleName GPRegistryPolicyDsc -Name RegistryPolicyFile
+    Import-DscResource -ModuleName GPRegistryPolicyDsc
 
     node $NodeName
     {
@@ -107,6 +107,11 @@ Configuration RegistryPolicyFile_DisableSmb1Config
             ValueName  = $ValueName
             ValueData  = $ValueData
             ValueType  = $ValueType
+        }
+
+        RefreshRegistryPolicy RefreashPolicyAfterSMB1
+        {
+            Name = 'RefreashPolicyAfterSMB1'
         }
     }
 }
