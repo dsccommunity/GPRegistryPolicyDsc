@@ -52,6 +52,15 @@ else
                 ValueName  = 'SMB1'
                 ValueData  = 1
                 ValueType  = 'DWORD'
+            
+                # data for  MSFT_RegistryPolicyFile_DisableSMB1_Config
+                #DtModNodeName   = 'localhost'
+                DtModKey         = 'Software\Microsoft\Windows\CurrentVersion\Policies\Explorer'
+                DtModTargetType  = 'Account'
+                DtModValueName   = 'NoActiveDesktopChanges'
+                DtModAccountName = 'builtin\Users'
+                DtModValueData   = 1
+                DtModValueType   = 'DWORD'
             }
         )
     }
@@ -63,7 +72,6 @@ else
         SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
         SMB1 = 1
 #>
-# TODO: Modify ResourceName and ShortDescriptiveName (e.g. MSFT_Firewall_EnableRemoteDesktopConnection_Config).
 Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
 {
     Import-DscResource -ModuleName 'GPRegistryPolicyDsc'
@@ -86,8 +94,11 @@ Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
     }
 }
 
-# TODO: (Optional) Add More Configuration Templates as needed.
-Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
+<#
+    .SYNOPSIS
+        Enfores the policy the prohibits changes to desktop for non-administrators
+#>
+Configuration MSFT_RegistryPolicyFile_Disable_DesktopModification_Config
 {
     Import-DscResource -ModuleName 'GPRegistryPolicyDsc'
 
@@ -95,12 +106,12 @@ Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
     {
         RegistryPolicyFile 'Integration_Test_Disable_DesktopModification'
         {
-            Key = $node.Key
-            TargetType  = $node.TargetType
-            ValueName   = $node.ValueName
-            ValueData   = $node.ValueData
-            ValueType   = $node.ValueType
-            AccountName = $node.AccountName
+            Key         = $node.DtModKey
+            TargetType  = $node.DtModTargetType
+            ValueName   = $node.DtModValueName
+            ValueData   = $node.DtModValueData
+            ValueType   = $node.DtModValueType
+            AccountName = $node.DtModAccountName
         }
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_Disable_DesktopModification'

@@ -20,7 +20,7 @@
 <#
     .DESCRIPTION
         Configuration that will enable the the policy the prohibits changes to the desktop only
-        for the User1 account.
+        for the Users group (Non-administrators) account.
 #>
 Configuration RegistryPolicyFile_DisableDesktopChanges_Config
 {
@@ -33,7 +33,7 @@ Configuration RegistryPolicyFile_DisableDesktopChanges_Config
             Key         = 'Software\Microsoft\Windows\CurrentVersion\Policies\Explorer'
             TargetType  = 'Account'
             ValueName   = 'NoActiveDesktopChanges'
-            AccountName = 'User1'
+            AccountName = 'Users'
             ValueData   = 1
             ValueType   = 'DWORD'
             Ensure      = 'Present'
@@ -41,7 +41,7 @@ Configuration RegistryPolicyFile_DisableDesktopChanges_Config
 
         RefreshRegistryPolicy RefreashPolicyAfterDisableDesktopChanges
         {
-            Name = 'RefreashPolicyAfterDisableDesktopChanges'
+            Name      = 'RefreashPolicyAfterDisableDesktopChanges'
             DependsOn = '[RegistryPolicyFile]DisableDesktopChanges'
         }
     }

@@ -5,7 +5,7 @@ change helps make the DSC resources even better for everyone to use.
 
 ## Common contribution guidelines
 
-THis resource module follow all of the common contribution guidelines for
+This resource module follow all of the common contribution guidelines for
 DSC resource modules [outlined in DscResources repository](https://github.com/PowerShell/DscResources/blob/master/CONTRIBUTING.md),
 so please review these as a baseline for contributing.
 

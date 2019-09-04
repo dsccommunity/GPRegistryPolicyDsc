@@ -111,7 +111,7 @@ Configuration RegistryPolicyFile_DisableSmb1_Config
 
         RefreshRegistryPolicy RefreashPolicyAfterSMB1
         {
-            Name = 'RefreashPolicyAfterSMB1'
+            Name      = 'RefreashPolicyAfterSMB1'
             DependsOn = '[RegistryPolicyFile]TurnOffSmb1'
         }
     }

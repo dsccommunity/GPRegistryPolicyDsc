@@ -1,9 +1,9 @@
 @{
   # Version number of this module.
-  moduleVersion = '0.1.0.0'
+  moduleVersion = '1.0.0.0'
 
   # ID used to uniquely identify this module
-  GUID = '51ec66c8-8cd5-4b78-8923-c9b85d673f90'
+  GUID = 'fcded2c6-6ba2-4d6c-a35e-55848f90462b'
 
   # Author of this module
   Author = 'Microsoft Corporation'
@@ -25,11 +25,6 @@
 
   # Functions to export from this module
   FunctionsToExport = '*'
-
-  # Cmdlets to export from this module
-  CmdletsToExport = '*'
-
-  RequiredAssemblies = @()
 
   # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
   PrivateData = @{

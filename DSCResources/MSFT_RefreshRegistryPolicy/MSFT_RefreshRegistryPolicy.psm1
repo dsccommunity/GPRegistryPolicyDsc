@@ -78,19 +78,17 @@ function Test-TargetResource
         $Name
     )
 
-    $testTargetResourceResult = $false
-
     $getTargetResourceResult = Get-TargetResource -Name $Name
 
     if ($getTargetResourceResult.RefreshRequiredKey -ne 1)
     {
         Write-Verbose -Message $script:localizedData.NotRefreshRequired
-        $testTargetResourceResult = $true
+        return $true
     }
 
     Write-Verbose -Message $script:localizedData.RefreshRequired
 
-    return $testTargetResourceResult
+    return $false
 }
 
 <#
