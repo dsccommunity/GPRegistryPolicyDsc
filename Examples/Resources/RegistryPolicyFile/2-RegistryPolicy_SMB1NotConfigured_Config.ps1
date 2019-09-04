@@ -39,6 +39,7 @@ Configuration RegistryPolicy_SMB1NotConfigured_Config
         RefreshRegistryPolicy RefreashPolicyAfterSMB1
         {
             Name = 'RefreashPolicyAfterSMB1'
+            DependsOn = '[RegistryPolicyFile]SMB1NotConfigured'
         }
     }
 }

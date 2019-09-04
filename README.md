@@ -71,7 +71,7 @@ A full list of changes in each version can be found in the [change log](CHANGELO
 ## Resources
 
 * [**RegistryPolicyFile**](#RegistryPolicyFile) A resource to manage registry policy entries in a policy (.pol) file.
-* {**Resource2** One line description of resource 1}
+* [**RefreshRegistryPolicy**](#RefreshRegistryPolicy) A resource to detect and invoke a group policy refresh.
 
 ### RegistryPolicyFile
 
@@ -83,7 +83,7 @@ A resource to manage registry policy entries in a policy (.pol) file.
 
 #### Parameters
 
-* **`[String]` Key** _(Key)_: TIndicates the path of the registry key for which you want to ensure a specific state.
+* **`[String]` Key** _(Key)_: Indicates the path of the registry key for which you want to ensure a specific state.
 * **`[String]` ValueName** _(Required)_: Indicates the name of the registry value.
 * **`[String]` TargetType** _(Required)_: Indicates the target type. This is needed to determine the .pol file path. Supported values are ComputerConfiguration, UserConfiguration, Administrators, NonAdministrators, and Account.
 * **`[String]` AccountName** _(Write)_: Specifies the name of the account for an user specific pol file to be managed.
@@ -106,3 +106,25 @@ A resource to manage registry policy entries in a policy (.pol) file.
 #### Known issues
 
 All issues are not listed here, see [here for all open issues](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues?utf8=✓&q=is%3Aissue+is%3Aopen+RegistryPolicyFile).
+
+### RefreshRegistryPolicy
+
+A resource to detect and invoke a group policy refresh.
+
+#### Requirements
+
+* Target machine must be running Windows Server 2008 R2 or later.
+
+#### Parameters
+
+* **`[String]` Name** _(Key)_: A name to serve as the key property. It is not used during configuration.
+
+#### Read-Only Properties from Get-TargetResource
+
+* **`[String]` RefreshRequiredKey** _(Read)_: Specifies the value of the GPRegistryPolicy key indicating a group policy refresh is needed.
+* **`[String]` Path** _(Read)_: Specifies the path of the RefreshRequired property indicating a group policy refresh is needed.
+
+## Known issues
+
+All issues are not listed here, see [here for all open issues](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues?utf8=✓&q=is%3Aissue+is%3Aopen+RefreshRegistryPolicy).
+
