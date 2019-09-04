@@ -24,19 +24,15 @@ function Get-TargetResource
         $Name
     )
 
-    $path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy'
-    $key = 'RefreshRequired'
-
-    $registryKey = Get-Item -Path $path -ErrorAction SilentlyContinue
-    $refreshKeyValue = ($registryKey | Get-ItemProperty).$key
+    $refreshKeyValue = Read-GPRefreshRegistryKey
 
     # TODO: Code that returns the current state.
-    Write-Verbose -Message ($script:localizedData.RefreshRequiredValue -f $refreshKeyValue)
+    Write-Verbose -Message ($script:localizedData.RefreshRequiredValue -f $refreshKeyValue.Value)
 
     return @{
         Name                = $Name
-        Path                = $registryKey.Name
-        RefreshRequiredKey  = $refreshKeyValue
+        Path                = $refreshKeyValue.Path
+        RefreshRequiredKey  = $refreshKeyValue.Value
     }
 }
 
@@ -95,4 +91,37 @@ function Test-TargetResource
     Write-Verbose -Message $script:localizedData.RefreshRequired
 
     return $testTargetResourceResult
+}
+
+<#
+    .SYNOPSIS
+        Writes a registry key indicating a group policy refresh is required.
+
+    .PARAMETER Path
+        Specifies the value of the registry path that will contain the properties pertaining to requiring a refresh.
+
+    .PARAMETER PropertyName
+        Specifies a name for the new property.
+#>
+function Read-GPRefreshRegistryKey
+{
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param
+    (
+        [Parameter()]
+        [string]
+        $Path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy',
+
+        [Parameter()]
+        [string]
+        $PropertyName = 'RefreshRequired'
+    )
+
+    $registryKey = Get-Item -Path $Path -ErrorAction SilentlyContinue
+
+    [PSCustomObject]@{
+        Path  = $registryKey.Name
+        Value = ($registryKey | Get-ItemProperty).$PropertyName
+    }
 }

@@ -34,15 +34,15 @@ try
     InModuleScope $script:dscResourceName {
         Describe 'MSFT_RefreshRegistryPolicy\Get-TargetResource' -Tag 'Get' {
             BeforeAll {
-                $mockGetItem = @{
-                    Name = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy'
-                    RefreshRequired = 1
+                $mockReadRefreshKey = @{
+                    Path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy'
+                    Value = 1
                 }
             }
 
             Context 'When the system is in the desired state' {
                 BeforeEach {
-                    Mock -CommandName Get-Item -MockWith {}
+                    Mock -CommandName Read-GPRefreshRegistryKey -MockWith {}
                 }
 
                 It 'Should return the proper registry key property values' {
@@ -50,15 +50,14 @@ try
                     $getTargetResourceResult.Path | Should -Be $null
                     $getTargetResourceResult.RefreshRequiredKey | Should -Be $null
 
-                    Assert-MockCalled -CommandName Get-Item -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Read-GPRefreshRegistryKey -Exactly -Times 1 -Scope It
                 }
 
             }
 
             Context 'When the system is not in the desired state' {
                 BeforeEach {
-                    Mock -CommandName Get-Item -MockWith {$mockGetItem}
-                    Mock -CommandName Get-ItemProperty -MockWith {$mockGetItem}
+                    Mock -CommandName Read-GPRefreshRegistryKey -MockWith {$mockGetItem}
                 }
 
                 It 'Should return a RefreshRequired value of 1' {
@@ -66,8 +65,7 @@ try
                     $getTargetResourceResult.Path | Should -Be $mockGetItem.Name
                     $getTargetResourceResult.RefreshRequiredKey | Should -Be $mockGetItem.RefreshRequired
 
-                    Assert-MockCalled -CommandName Get-Item -Exactly -Times 1 -Scope It
-                    Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Read-GPRefreshRegistryKey -Exactly -Times 1 -Scope It
                 }
             }
         }

@@ -34,6 +34,8 @@ Configuration RegistryPolicyFile_DisableDesktopChanges_Config
             TargetType  = 'Account'
             ValueName   = 'NoActiveDesktopChanges'
             AccountName = 'User1'
+            ValueData   = 1
+            ValueType   = 'DWORD'
             Ensure      = 'Present'
         }
 

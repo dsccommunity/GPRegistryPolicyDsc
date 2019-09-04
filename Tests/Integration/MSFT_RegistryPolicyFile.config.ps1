@@ -70,15 +70,13 @@ Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
 
     node $AllNodes.NodeName
     {
-        # TODO: Modify ResourceFriendlyName (e.g. Firewall).
         RegistryPolicyFile 'Integration_Test_Disable_SMB1'
         {
-            # TODO: Add resource parameters here.
             Key = $node.Key
             TargetType = $node.TargetType
-            ValueName = $node.ValueName
-            ValueData = $node.ValueData
-            ValueType = $node.ValueType
+            ValueName  = $node.ValueName
+            ValueData  = $node.ValueData
+            ValueType  = $node.ValueType
         }
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_SMB1'
@@ -89,3 +87,25 @@ Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
 }
 
 # TODO: (Optional) Add More Configuration Templates as needed.
+Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
+{
+    Import-DscResource -ModuleName 'GPRegistryPolicyDsc'
+
+    node $AllNodes.NodeName
+    {
+        RegistryPolicyFile 'Integration_Test_Disable_DesktopModification'
+        {
+            Key = $node.Key
+            TargetType  = $node.TargetType
+            ValueName   = $node.ValueName
+            ValueData   = $node.ValueData
+            ValueType   = $node.ValueType
+            AccountName = $node.AccountName
+        }
+
+        RefreshRegistryPolicy 'Integration_Test_RefreshAfter_Disable_DesktopModification'
+        {
+            Name = 'RefreshPolicyAfterDisableDesktopModification'
+        }
+    }
+}
