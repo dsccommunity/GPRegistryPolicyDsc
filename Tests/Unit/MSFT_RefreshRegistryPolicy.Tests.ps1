@@ -72,8 +72,14 @@ try
 
         Describe 'MSFT_RefreshRegistryPolicy\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
-                Mock -CommandName Invoke-Command
+                Mock -CommandName Invoke-Command -MockWith {
+                    "For synchronous foreground user policy application, a relogon is required.
+                     For synchronous foreground computer policy application, a restart is required.
+                     OK to restart? (Y/N)
+                     OK to log off? (Y/N)"
+                }
                 Mock -CommandName Remove-Item
+                Mock -CommandName Write-Warning
             }
 
             Context 'When the system is not in the desired state' {
@@ -81,6 +87,7 @@ try
                     Set-TargetResource -Name 'Test'
                     Assert-MockCalled -CommandName Invoke-Command -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Remove-Item -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Write-Warning -Exactly -Times 1 -Scope It
                 }
             }
         }

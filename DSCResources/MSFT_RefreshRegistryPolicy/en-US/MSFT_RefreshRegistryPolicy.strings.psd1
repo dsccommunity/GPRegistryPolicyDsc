@@ -3,4 +3,5 @@ ConvertFrom-StringData @'
     RefreshingGroupPolicy   = Refreshing group policy.
     NotRefreshRequired      = Group policy refresh is not required.
     RefreshRequired         = Group policy refresh is required.
+    RebootRequired          = A reboot is required.
 '@

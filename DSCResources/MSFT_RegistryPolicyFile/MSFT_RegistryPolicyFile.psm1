@@ -141,7 +141,7 @@ function Set-TargetResource
         $TargetType,
 
         [Parameter()]
-        [System.String]
+        [System.String[]]
         $ValueData,
 
         [Parameter()]
@@ -195,19 +195,7 @@ function Set-TargetResource
         }
     }
 
-    Set-GPRefreshRegistryKey
-}
-
-<#
-    .SYNOPSIS
-        Invokes gpupdate.exe to apply policies.
-#>
-function Invoke-GPRegistryUpdate
-{
-    [CmdletBinding()]
-    param ()
-
-    Start-Process -FilePath gpupdate.exe -ArgumentList '/force /wait:0' -Wait -NoNewWindow
+    Set-RefreshRegistryKey
 }
 
 <#
@@ -255,7 +243,7 @@ function Test-TargetResource
         $TargetType,
 
         [Parameter()]
-        [System.String]
+        [System.String[]]
         $ValueData,
 
         [Parameter()]
@@ -424,7 +412,7 @@ function ConvertTo-NTAccountName
     .PARAMETER Value
         Specifies the property value.
 #>
-function Set-GPRefreshRegistryKey
+function Set-RefreshRegistryKey
 {
     [CmdletBinding()]
     param

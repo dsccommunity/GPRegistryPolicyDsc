@@ -1,11 +1,11 @@
-# Import the DscResource.Common module to test
+# Import the GPRegistryPolicyDsc.Common module to test
 $script:resourceModulePath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
-$script:modulesFolderPath = Join-Path -Path $script:resourceModulePath -ChildPath 'Modules\DscResource.Common'
+$script:modulesFolderPath = Join-Path -Path $script:resourceModulePath -ChildPath 'Modules\GPRegistryPolicyDsc.Common'
 
-Import-Module -Name (Join-Path -Path $script:modulesFolderPath -ChildPath 'DscResource.Common.psm1') -Force
+Import-Module -Name (Join-Path -Path $script:modulesFolderPath -ChildPath 'GPRegistryPolicyDsc.Common.psm1') -Force
 
-InModuleScope 'DscResource.Common' {
-    Describe 'DscResource.Common\Test-DscParameterState' -Tag TestDscParameterState {
+InModuleScope 'GPRegistryPolicyDsc.Common' {
+    Describe 'GPRegistryPolicyDsc.Common\Test-DscParameterState' -Tag TestDscParameterState {
         Context -Name 'When passing values' -Fixture {
             It 'Should return true for two identical tables' {
                 $mockDesiredValues = @{ Example = 'test' }
@@ -308,7 +308,7 @@ InModuleScope 'DscResource.Common' {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.Common\Get-LocalizedData' {
+    Describe 'GPRegistryPolicyDsc.Common\Get-LocalizedData' {
         $mockTestPath = {
             return $mockTestPathReturnValue
         }
@@ -402,7 +402,7 @@ InModuleScope 'DscResource.Common' {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.Common\New-InvalidResultException' {
+    Describe 'GPRegistryPolicyDsc.Common\New-InvalidResultException' {
         Context 'When calling with Message parameter only' {
             It 'Should throw the correct error' {
                 $mockErrorMessage = 'Mocked error'
@@ -426,7 +426,7 @@ InModuleScope 'DscResource.Common' {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.Common\New-ObjectNotFoundException' {
+    Describe 'GPRegistryPolicyDsc.Common\New-ObjectNotFoundException' {
         Context 'When calling with Message parameter only' {
             It 'Should throw the correct error' {
                 $mockErrorMessage = 'Mocked error'
@@ -450,7 +450,7 @@ InModuleScope 'DscResource.Common' {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.Common\New-InvalidOperationException' {
+    Describe 'GPRegistryPolicyDsc.Common\New-InvalidOperationException' {
         Context 'When calling with Message parameter only' {
             It 'Should throw the correct error' {
                 $mockErrorMessage = 'Mocked error'
@@ -474,7 +474,7 @@ InModuleScope 'DscResource.Common' {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.Common\New-NotImplementedException' {
+    Describe 'GPRegistryPolicyDsc.Common\New-NotImplementedException' {
         Context 'When called with Message parameter only' {
             It 'Should throw the correct error' {
                 $mockErrorMessage = 'Mocked error'
@@ -498,7 +498,7 @@ InModuleScope 'DscResource.Common' {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.Common\New-InvalidArgumentException' {
+    Describe 'GPRegistryPolicyDsc.Common\New-InvalidArgumentException' {
         Context 'When calling with both the Message and ArgumentName parameter' {
             It 'Should throw the correct error' {
                 $mockErrorMessage = 'Mocked error'

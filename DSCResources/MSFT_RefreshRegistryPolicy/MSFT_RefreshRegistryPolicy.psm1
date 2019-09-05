@@ -55,9 +55,15 @@ function Set-TargetResource
 
     Write-Verbose -Message $script:localizedData.RefreshingGroupPolicy
 
-    Invoke-Command -ScriptBlock {gpupdate.exe /force}
+    $gpupdateResult = Invoke-Command -ScriptBlock {'N','N' | gpupdate.exe /force}
 
     Remove-Item -Path HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy -Force
+
+    if ($gpupdateResult -match 'reboot|log\soff')
+    {
+        Write-Warning -Message ($script:localizedData.RebootRequired)
+        $global:DSCMachineStatus = 1
+    }
 }
 
 <#

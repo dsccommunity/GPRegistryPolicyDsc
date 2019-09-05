@@ -277,8 +277,7 @@ try
                 Mock -CommandName Set-GPRegistryPolicyFileEntry -Verifiable
 
                 $polFilePath = "C:\Windows\System32\GroupPolicy\Machine\registry.pol"
-                Mock -CommandName Invoke-GPRegistryUpdate
-                Mock -CommandName Set-GPRefreshRegistryKey
+                Mock -CommandName Set-RefreshRegistryKey
             }
 
             BeforeEach {
@@ -309,7 +308,7 @@ try
                     { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
 
                     Assert-MockCalled -CommandName Remove-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
-                    Assert-MockCalled -CommandName Set-GPRefreshRegistryKey -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Set-RefreshRegistryKey -Exactly -Times 1 -Scope 'It'
                 }
             }
 
@@ -333,7 +332,7 @@ try
 
                     Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 1 -Scope 'It'
                     Assert-MockCalled -CommandName Set-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
-                    Assert-MockCalled -CommandName Set-GPRefreshRegistryKey -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Set-RefreshRegistryKey -Exactly -Times 1 -Scope 'It'
                 }
             }
 
@@ -353,7 +352,7 @@ try
 
                     Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 0 -Scope 'It'
                     Assert-MockCalled -CommandName Set-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
-                    Assert-MockCalled -CommandName Set-GPRefreshRegistryKey -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName Set-RefreshRegistryKey -Exactly -Times 1 -Scope 'It'
                 }
             }
         }

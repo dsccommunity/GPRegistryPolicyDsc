@@ -70,12 +70,12 @@ prefixed with just 'Sql'
 Helper functions that are only used by one resource
 so preferably be put in the same script file as the resource.
 Helper function that can used by more than one resource can preferably
-be placed in the resource module file [DscResource.Common](/Modules/DscResource.Common/DscResource.Common.psm1).
+be placed in the resource module file [GPRegistryPolicyDsc.Common](/Modules/GPRegistryPolicyDsc.Common/GPRegistryPolicyDsc.Common.psm1).
 
 ### Localization
 
 Please see the localization section in the [style guideline](https://github.com/PowerShell/DscResources/blob/master/StyleGuidelines.md#localization).
-The helper function are found in the module [DscResource.Common](/Modules/DscResource.Common/DscResource.Common.psm1).
+The helper function are found in the module [GPRegistryPolicyDsc.Common](/Modules/GPRegistryPolicyDsc.Common/GPRegistryPolicyDsc.Common.psm1).
 
 ### Unit tests
 
