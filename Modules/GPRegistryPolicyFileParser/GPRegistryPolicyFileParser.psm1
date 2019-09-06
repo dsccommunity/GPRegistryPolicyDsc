@@ -117,7 +117,8 @@ function Read-GPRegistryPolicyFile
             #>
             if ($valueType -eq [RegType]::REG_MULTI_SZ)
             {
-                [string] $value = [System.Text.Encoding]::UNICODE.GetString($policyContents[($index)..($index+$valueLength-3)])
+                [string] $rawValue = [System.Text.Encoding]::UNICODE.GetString($policyContents[($index)..($index+$valueLength-3)])
+                $value = Format-MultiStringValue -MultiStringValue $rawValue
                 $index += $valueLength
             }
 
@@ -230,7 +231,7 @@ function New-GPRegistryPolicy
         $ValueLength = $null,
         
         [Parameter(Position=4)]
-        [object]
+        [object[]]
         $ValueData = $null
     )
 
@@ -326,7 +327,7 @@ function New-GPRegistrySettingsEntry
 
             ([RegType]::REG_DWORD)
             {
-                $dataBytes = [System.BitConverter]::GetBytes([Int32]$policy.ValueData)
+                $dataBytes = [System.BitConverter]::GetBytes([Int32](Convert-StringToInt -ValueString $policy.ValueData))
                 $dataSize = 4
             }
 
@@ -524,6 +525,56 @@ function Get-ByteStreamParameter
     }
 
     return @{Encoding = 'Byte'}
+}
+
+<#
+    .SYNOPSIS
+        Formats a multistring value.
+
+    .DESCRIPTION
+        Formats a multistring value by first spliting on \0 and the removing the terminating \0\0.
+        This is need to match the desired valueData
+#>
+function Format-MultiStringValue
+{
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param
+    (
+        [Parameter()]
+        [object]
+        $MultiStringValue
+    )
+
+    $result = @()
+    if ($MultiStringValue -match '\0')
+    {
+        [System.Collections.ArrayList] $array = $MultiStringValue -split '\0'
+        # Remove the index with the terminating \0\0
+        $array.RemoveAt($array.Count -1)
+        $lastItem = $array[-1]
+
+        # Remove the terminating \0 from all indexes
+        foreach ($item in $array)
+        {
+            if ($item -eq $lastItem)
+            {
+                $result += $item
+                continue
+            }
+
+            $result += $item.Substring(0,$item.Length-1)
+        }
+        return $result
+    }
+    else
+    {
+        # If no terminating 0's are found split on whitespace
+        return (-split $MultiStringValue)
+    }
+    
+
+
 }
 
 Enum RegType

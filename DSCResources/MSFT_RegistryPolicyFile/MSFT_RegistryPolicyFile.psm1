@@ -86,7 +86,7 @@ function Get-TargetResource
     $getTargetResourceResult = @{
         Key         = $currentResults.Key
         ValueName   = $currentResults.ValueName
-        ValueData   = $currentResults.ValueData
+        ValueData   = [string[]]$currentResults.ValueData
         ValueType   = $valueTypeResult
         TargetType  = $TargetType
         Ensure      = $ensureResult

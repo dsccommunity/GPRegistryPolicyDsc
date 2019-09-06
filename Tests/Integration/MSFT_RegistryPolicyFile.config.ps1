@@ -54,13 +54,18 @@ else
                 ValueType  = 'DWORD'
             
                 # data for  MSFT_RegistryPolicyFile_DisableSMB1_Config
-                #DtModNodeName   = 'localhost'
                 DtModKey         = 'Software\Microsoft\Windows\CurrentVersion\Policies\Explorer'
                 DtModTargetType  = 'Account'
                 DtModValueName   = 'NoActiveDesktopChanges'
                 DtModAccountName = 'builtin\Users'
                 DtModValueData   = 1
                 DtModValueType   = 'DWORD'
+
+                SmbKey = 'SYSTEM\CurrentControlSet\Services\LanmanWorkstation'
+                SmbTargetType = 'ComputerConfiguration'
+                SmbValueName  = 'DependOnService'
+                SmbValueData  = 'Browser','MRxSmb20','NSI'
+                SmbValueType  = 'MultiString'
             }
         )
     }
@@ -117,6 +122,32 @@ Configuration MSFT_RegistryPolicyFile_Disable_DesktopModification_Config
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_Disable_DesktopModification'
         {
             Name = 'RefreshPolicyAfterDisableDesktopModification'
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Enfores the policy the configures Lanman dependent services.
+#>
+Configuration MSFT_RegistryPolicyFile_LanmanServices_Config
+{
+    Import-DscResource -ModuleName 'GPRegistryPolicyDsc'
+
+    node $AllNodes.NodeName
+    {
+        RegistryPolicyFile 'Integration_Test_LanmanServices'
+        {
+            Key         = $node.SmbKey
+            TargetType  = $node.SmbTargetType
+            ValueName   = $node.SmbValueName
+            ValueData   = $node.SmbValueData
+            ValueType   = $node.SmbValueType
+        }
+
+        RefreshRegistryPolicy 'Integration_Test_RefreshAfter_LanmanServices'
+        {
+            Name = 'RefreshPolicyAfterLanmanServices'
         }
     }
 }
