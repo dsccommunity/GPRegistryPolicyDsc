@@ -29,10 +29,10 @@ function Read-GPRegistryPolicyFile
 
     [Array] $registryPolicies = @()
     $index = 0
+    [string] $policyContents = Get-Content $Path -Raw
 
     if ($PSVersionTable.Edition -eq 'Core')
     {
-        [string] $policyContents = Get-Content $Path -Raw
         [byte[]] $policyContentInBytes = Get-Content $Path -Raw -AsByteStream
     }
     else

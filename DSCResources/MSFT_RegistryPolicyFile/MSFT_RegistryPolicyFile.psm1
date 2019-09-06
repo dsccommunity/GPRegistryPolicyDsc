@@ -269,7 +269,6 @@ function Test-TargetResource
     }
 
     $testTargetResourceResult = $false
-    #$PSBoundParameters.ValueType = [GPRegistryPolicy]::GetRegTypeFromString($ValueType)
 
     $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
 
@@ -387,6 +386,7 @@ function ConvertTo-SecurityIdentifier
 function ConvertTo-NTAccountName
 {
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter(Mandatory=$true)]
@@ -418,15 +418,15 @@ function Set-RefreshRegistryKey
     param
     (
         [Parameter()]
-        [string]
+        [System.String]
         $Path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy',
 
         [Parameter()]
-        [string]
+        [System.String]
         $PropertyName = 'RefreshRequired',
 
         [Parameter()]
-        [object]
+        [System.Object]
         $Value = 1
     )
 

@@ -127,4 +127,3 @@ A resource to detect and invoke a group policy refresh.
 ## Known issues
 
 All issues are not listed here, see [here for all open issues](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues?utf8=✓&q=is%3Aissue+is%3Aopen+RefreshRegistryPolicy).
-
