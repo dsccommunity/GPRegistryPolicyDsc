@@ -327,7 +327,7 @@ function New-GPRegistrySettingsEntry
 
             ([RegType]::REG_DWORD)
             {
-                $dataBytes = [System.BitConverter]::GetBytes([Int32](Convert-StringToInt -ValueString $policy.ValueData))
+                $dataBytes = [System.BitConverter]::GetBytes([Int32] ([string]$policy.ValueData))
                 $dataSize = 4
             }
 
