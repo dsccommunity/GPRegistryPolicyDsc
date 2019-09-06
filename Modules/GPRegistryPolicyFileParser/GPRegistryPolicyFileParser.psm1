@@ -37,7 +37,6 @@ function Read-GPRegistryPolicyFile
     }
     else
     {
-        [string] $policyContents = Get-Content $Path -Raw
         [byte[]] $policyContentInBytes = Get-Content $Path -Raw -Encoding Byte
     }
 
@@ -313,7 +312,7 @@ function New-GPRegistrySettingsEntry
         # get data bytes then compute byte size based on data and type
         switch ($policy.ValueType)
         {
-            {@([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ, [RegType]::REG_MULTI_SZ) -contains $_}
+            {@([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ, [RegType]::REG_MULTI_SZ) -contains $_} # need a fix here
             {
                 $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($policy.ValueData + "`0")
                 $dataSize = $dataBytes.Count
