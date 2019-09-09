@@ -21,7 +21,7 @@ ModuleVersion = '1.0'
 GUID = '0223a0e8-85ac-4803-a127-585e547f34a8'
 
 # Author of this module
-#Author = 'Zia Jalali'
+Author = 'Zia Jalali, PowerSTIG Team'
 
 # Company or vendor of this module
 CompanyName = 'Microsoft'
@@ -30,7 +30,7 @@ CompanyName = 'Microsoft'
 Copyright = '(c) 2019 Administrator. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'These cmdlets will allow you to work with .POL files, which contain the registry keys enacted by Group Policy.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.0'
@@ -50,12 +50,6 @@ FunctionsToExport = @(
     'Set-GPRegistryPolicyFileEntry'
     'Remove-GPRegistryPolicyFileEntry'
 )
-
-# Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = @()
-
-# Variables to export from this module
-VariablesToExport = '*'
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{

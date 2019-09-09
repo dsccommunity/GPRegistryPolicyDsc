@@ -13,6 +13,7 @@ else
     $ConfigurationData = @{
         AllNodes = @(
             @{
+                # policy with a dword datatype
                 NodeName   = 'localhost'
                 Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
                 TargetType = 'ComputerConfiguration'
@@ -20,7 +21,7 @@ else
                 ValueData  = 1
                 ValueType  = 'DWORD'
             
-                # data for  MSFT_RegistryPolicyFile_DisableSMB1_Config
+                # policy target at a user account
                 DtModKey         = 'Software\Microsoft\Windows\CurrentVersion\Policies\Explorer'
                 DtModTargetType  = 'Account'
                 DtModValueName   = 'NoActiveDesktopChanges'
@@ -28,11 +29,19 @@ else
                 DtModValueData   = 1
                 DtModValueType   = 'DWORD'
 
+                # policy with a multi-string datatype
                 SmbKey = 'SYSTEM\CurrentControlSet\Services\LanmanWorkstation'
                 SmbTargetType = 'ComputerConfiguration'
                 SmbValueName  = 'DependOnService'
                 SmbValueData  = 'Browser','MRxSmb20','NSI'
                 SmbValueType  = 'MultiString'
+
+                # policy with a string datatype
+                FtKey = 'Software\Policies\Microsoft\Windows\TCPIP\v6Transition'
+                FtTargetType = 'ComputerConfiguration'
+                FtValueName  = 'Force_Tunneling'
+                FtValueData  = 'Enabled'
+                FtValueType  = 'String'
             }
         )
     }
@@ -68,7 +77,8 @@ Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
 
 <#
     .SYNOPSIS
-        Enfores the policy the prohibits changes to desktop for non-administrators
+        Enfores the policy the prohibits changes to desktop for non-administrators.
+        Tests the scenario where the targetType is a user account.
 #>
 Configuration MSFT_RegistryPolicyFile_Disable_DesktopModification_Config
 {
@@ -95,7 +105,8 @@ Configuration MSFT_RegistryPolicyFile_Disable_DesktopModification_Config
 
 <#
     .SYNOPSIS
-        Enfores the policy the configures Lanman dependent services.
+        Enfores the policy that configures Lanman dependent services.
+        Tests the scenario when the dataType is muti-string.
 #>
 Configuration MSFT_RegistryPolicyFile_LanmanServices_Config
 {
@@ -115,6 +126,33 @@ Configuration MSFT_RegistryPolicyFile_LanmanServices_Config
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_LanmanServices'
         {
             Name = 'RefreshPolicyAfterLanmanServices'
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Enfores the policy the enables IPv6 forced tunneling.
+        Tests the scenario when dataType is a string.
+#>
+Configuration MSFT_RegistryPolicyFile_ForcedTunneling_Config
+{
+    Import-DscResource -ModuleName 'GPRegistryPolicyDsc'
+
+    node $AllNodes.NodeName
+    {
+        RegistryPolicyFile 'Integration_Test_ForcedTunneling'
+        {
+            Key         = $node.FtKey
+            TargetType  = $node.FtTargetType
+            ValueName   = $node.FtValueName
+            ValueData   = $node.FtValueData
+            ValueType   = $node.FtValueType
+        }
+
+        RefreshRegistryPolicy 'Integration_Test_RefreshAfter_ForcedTunneling'
+        {
+            Name = 'RefreshPolicyAfterForcedTunneling'
         }
     }
 }

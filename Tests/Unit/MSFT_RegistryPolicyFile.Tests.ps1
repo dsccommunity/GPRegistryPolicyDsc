@@ -406,21 +406,6 @@ try
                 }
             }
         }
-
-        Describe 'MSFT_RegistryPolicyFile\Get-ByteStreamParameter' -Tag 'Helper' {
-            BeforeAll {
-                $pseditionMap = @{
-                    Core = 'AsByteStream'
-                    Desktop = 'Encoding'
-                }
-            }
-            Context 'Assert correct PSEdition is returned' {
-                It 'Should return the correct PSEdition' {
-                    $result = Get-ByteStreamParameter
-                    $result.ContainsKey($pseditionMap[$PSVersionTable.PSEdition]) | Should -Be $true
-                }
-            }
-        }
     }
 }
 finally

@@ -457,12 +457,15 @@ function Remove-GPRegistryPolicyFileEntry
 
     # write entries to file
     New-GPRegistryPolicyFile -Path $Path
+    $encodingParameter = Get-ByteStreamParameter
 
     if ($null -ne $desiredEntries)
     {
-        $desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
-        $encodingParameter = Get-ByteStreamParameter
-        $desiredEntriesCollection | Add-Content -Path $Path -Force @encodingParameter
+        foreach ($desiredEntry in $desiredEntries)
+        {
+            [byte[]] $entry = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntry
+            $entry | Add-Content -Path $Path -Force @encodingParameter
+        }
     }
 }
 

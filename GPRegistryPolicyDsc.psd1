@@ -38,7 +38,7 @@
           ProjectUri = 'https://github.com/dsccommunity/GPRegistryPolicyDsc'
 
           # ReleaseNotes of this module
-        ReleaseNotes = ''
+        ReleaseNotes = 'Intial release.'
 
       } # End of PSData hash table
 
