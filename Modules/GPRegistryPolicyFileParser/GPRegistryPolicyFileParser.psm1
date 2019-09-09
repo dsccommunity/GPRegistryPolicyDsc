@@ -287,52 +287,52 @@ function New-GPRegistrySettingsEntry
     param
     (
         [Parameter(Mandatory=$true)]
+        [Alias("Policy")]
         [GPRegistryPolicy[]]
         $RegistryPolicy
     )
 
     [byte[]] $entry = @()
-    foreach ($policy in $RegistryPolicy)
-    {
+
         # openning bracket
         $entry += [System.Text.Encoding]::Unicode.GetBytes('[')
-        $entry += [System.Text.Encoding]::Unicode.GetBytes($policy.Key + "`0")
+        $entry += [System.Text.Encoding]::Unicode.GetBytes($RegistryPolicy.Key + "`0")
 
         # semicolon as delimiter
         $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
-        $entry += [System.Text.Encoding]::Unicode.GetBytes($policy.ValueName + "`0")
+        $entry += [System.Text.Encoding]::Unicode.GetBytes($RegistryPolicy.ValueName + "`0")
 
         # semicolon as delimiter
         $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
-        $entry += [System.BitConverter]::GetBytes([Int32]$policy.ValueType)
+        $entry += [System.BitConverter]::GetBytes([Int32]$RegistryPolicy.ValueType)
 
         # semicolon as delimiter
         $entry += [System.Text.Encoding]::Unicode.GetBytes(';')
 
         # get data bytes then compute byte size based on data and type
-        switch ($policy.ValueType)
+        switch ($RegistryPolicy.ValueType)
         {
-            {@([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ, [RegType]::REG_MULTI_SZ) -contains $_} # need a fix here
+            {@([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ, [RegType]::REG_MULTI_SZ) -contains $_}
             {
-                $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($policy.ValueData + "`0")
+                $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($RegistryPolicy.ValueData + "`0")
                 $dataSize = $dataBytes.Count
             }
 
             ([RegType]::REG_BINARY)
             {
-                $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($policy.ValueData)
+                $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($RegistryPolicy.ValueData)
                 $dataSize = $dataBytes.Count
             }
 
             ([RegType]::REG_DWORD)
             {
-                $dataBytes = [System.BitConverter]::GetBytes([Int32] ([string]$policy.ValueData))
+                $dataBytes = [System.BitConverter]::GetBytes([Int32] ([string]$RegistryPolicy.ValueData))
                 $dataSize = 4
             }
 
             ([RegType]::REG_QWORD)
             {
-                $dataBytes = [System.BitConverter]::GetBytes([Int64]$policy.ValueData)
+                $dataBytes = [System.BitConverter]::GetBytes([Int64]$RegistryPolicy.ValueData)
                 $dataSize = 8
             }
 
@@ -351,7 +351,7 @@ function New-GPRegistrySettingsEntry
 
         # closing bracket
         $entry += [System.Text.Encoding]::Unicode.GetBytes(']')
-    }
+    
     return $entry
 }
 
@@ -404,12 +404,16 @@ function Set-GPRegistryPolicyFileEntry
     $desiredEntries += $RegistryPolicy
 
     # convert entries to byte array
-    $desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
+    #$desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
 
     New-GPRegistryPolicyFile -Path $Path
 
     $encodingParameter = Get-ByteStreamParameter
-    $desiredEntriesCollection | Add-Content -Path $Path -Force @encodingParameter
+    foreach ($desiredEntry in $desiredEntries)
+    {
+        [byte[]] $entry = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntry
+        $entry | Add-Content -Path $Path -Force @encodingParameter
+    }
 }
 
 <#
