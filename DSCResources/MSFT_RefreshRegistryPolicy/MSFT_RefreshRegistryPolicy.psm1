@@ -26,13 +26,12 @@ function Get-TargetResource
 
     $refreshKeyValue = Read-GPRefreshRegistryKey
 
-    # TODO: Code that returns the current state.
     Write-Verbose -Message ($script:localizedData.RefreshRequiredValue -f $refreshKeyValue.Value)
 
     return @{
-        Name                = $Name
-        Path                = $refreshKeyValue.Path
-        RefreshRequiredKey  = $refreshKeyValue.Value
+        Name               = $Name
+        Path               = $refreshKeyValue.Path
+        RefreshRequiredKey = $refreshKeyValue.Value
     }
 }
 

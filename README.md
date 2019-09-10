@@ -56,7 +56,7 @@ Get-DscResource -Module GPRegistryPolicyDsc
 
 ## Requirements
 
-The minimum Windows Management Framework (PowerShell) version required is 4.0
+The minimum Windows Management Framework (PowerShell) version required is 5.0
 or higher.
 
 ## Examples

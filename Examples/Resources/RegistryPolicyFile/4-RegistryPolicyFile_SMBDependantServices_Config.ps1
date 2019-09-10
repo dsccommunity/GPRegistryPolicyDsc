@@ -5,8 +5,8 @@
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
 .TAGS DSCConfiguration
-.LICENSEURI https://github.com/PowerShell/PowerShellGet/blob/master/LICENSE
-.PROJECTURI https://github.com/PowerShell/PowerShellGet
+.LICENSEURI https://github.com/dsccommunity/GPRegistryPolicyDsc/blob/master/LICENSE
+.PROJECTURI https://github.com/dsccommunity/GPRegistryPolicyDsc
 .ICONURI
 .EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS
