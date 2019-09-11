@@ -14,7 +14,7 @@
 #      environment configuration  #
 #---------------------------------#
 
-version: 1.0.{build}.0 # TODO: Modify version so it fits your versioning.
+version: 1.0.{build}.0
 environment:
   gallery_api:
     # TODO: Change to the correct API key if using PowerShell Gallery deploy task.
@@ -27,11 +27,6 @@ environment:
 
 install:
     - ps: |
-        # TODO: Remove these 4 rows.
-        # This is workaround for AppVeyor replaces '.' with '-' in the folder name.
-        Set-Location -Path 'C:\projects'
-        Rename-Item -Path 'C:\projects\dscresource-template' -NewName 'DscResource.Template' -Force
-        $env:APPVEYOR_BUILD_FOLDER = 'C:\projects\DscResource.Template'
         Set-Location -Path $env:APPVEYOR_BUILD_FOLDER
     - git clone https://github.com/PowerShell/DscResource.Tests
     - ps: Write-Verbose -Message "PowerShell version $($PSVersionTable.PSVersion)" -Verbose
