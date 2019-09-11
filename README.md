@@ -1,6 +1,7 @@
 # GPRegistryPolicyDsc
 
-This resource module contains resources used to apply and manage local group policies by modifying the respective .pol file.
+This resource module contains resources used to apply and manage local group policies
+by modifying the respective .pol file.
 
 This module is an adaptation from [GPRegistryPolicy](https://github.com/PowerShell/GPRegistryPolicy).
 
@@ -70,8 +71,10 @@ A full list of changes in each version can be found in the [change log](CHANGELO
 
 ## Resources
 
-* [**RegistryPolicyFile**](#RegistryPolicyFile) A resource to manage registry policy entries in a policy (.pol) file.
-* [**RefreshRegistryPolicy**](#RefreshRegistryPolicy) A resource to detect and invoke a group policy refresh.
+* [**RegistryPolicyFile**](#RegistryPolicyFile) A resource to manage registry policy
+   entries in a policy (.pol) file.
+* [**RefreshRegistryPolicy**](#RefreshRegistryPolicy) A resource to detect
+   and invoke a group policy refresh.
 
 ### RegistryPolicyFile
 
@@ -83,10 +86,15 @@ A resource to manage registry policy entries in a policy (.pol) file.
 
 #### Parameters
 
-* **`[String]` Key** _(Key)_: Indicates the path of the registry key for which you want to ensure a specific state.
+* **`[String]` Key** _(Key)_: Indicates the path of the registry key for which you want to ensure
+      a specific state.
 * **`[String]` ValueName** _(Required)_: Indicates the name of the registry value.
-* **`[String]` TargetType** _(Required)_: Indicates the target type. This is needed to determine the .pol file path. Supported values are ComputerConfiguration, UserConfiguration, Administrators, NonAdministrators, and Account.
-* **`[String]` AccountName** _(Write)_: Specifies the name of the account for an user specific pol file to be managed.
+* **`[String]` TargetType** _(Required)_: Indicates the target type.
+      This is needed to determine the .pol file path.
+      Supported values are ComputerConfiguration, UserConfiguration,
+      Administrators, NonAdministrators, and Account.
+* **`[String]` AccountName** _(Write)_: Specifies the name of the account
+      for an user specific pol file to be managed.
 * **`[String]` ValueData** _(Write)_: The data for the registry value.
 * **`[String]` ValueType** _(Write)_: Indicates the type of the value.
 * **`[String]` Ensure** _(Write)_: Specifies the desired state of the registry policy.
@@ -99,9 +107,10 @@ A resource to manage registry policy entries in a policy (.pol) file.
 
 #### Examples
 
-* [Disable SMB1](/Examples/Resources/RegistryPolicyFile/1-RegistryPolicyFile_DisableSmb1Config.ps1)
-* [Create folder as user](/Examples/Resources/Folder/2-DscResourceTemplate_CreateFolderAsUserConfig.ps1)
-* [Remove folder](/Examples/Resources/Folder/3-DscResourceTemplate_RemoveFolderConfig.ps1)
+* [Disable SMB1](/Examples/Resources/RegistryPolicyFile/1-RegistryPolicyFile_DisableSmb1_Config.ps1)
+* [Disable SMB1 not configured](/Examples/Resources/RegistryPolicyFile/2-RegistryPolicy_SMB1NotConfigured_Config.ps1)
+* [Disable desktop changes, Target type is Account](/Examples/Resources/RegistryPolicyFile/3-RegistryPolicyFile_DisableDesktopChanges_Config.ps1)
+* [Configure lanman dependant services, MutiString datatype example](/Examples/Resources/RegistryPolicyFile/4-RegistryPolicyFile_LanmanDependantServices_Config.ps1)
 
 #### Known issues
 
@@ -121,8 +130,10 @@ A resource to detect and invoke a group policy refresh.
 
 #### Read-Only Properties from Get-TargetResource
 
-* **`[String]` RefreshRequiredKey** _(Read)_: Specifies the value of the GPRegistryPolicy key indicating a group policy refresh is needed.
-* **`[String]` Path** _(Read)_: Specifies the path of the RefreshRequired property indicating a group policy refresh is needed.
+* **`[String]` RefreshRequiredKey** _(Read)_: Specifies the value of the
+      GPRegistryPolicy key indicating a group policy refresh is needed.
+* **`[String]` Path** _(Read)_: Specifies the path of the RefreshRequired
+      property indicating a group policy refresh is needed.
 
 ## Known issues
 
