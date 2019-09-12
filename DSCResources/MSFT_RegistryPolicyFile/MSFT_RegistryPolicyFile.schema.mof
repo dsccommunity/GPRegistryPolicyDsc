@@ -8,5 +8,5 @@ class MSFT_RegistryPolicyFile : OMI_BaseResource
     [Write, Description("The data for the registry value.")] String ValueData[];
     [Write, Description("Indicates the type of the value."), ValueMap{"Binary","Dword","ExpandString","MultiString","Qword","String","None"}, Values{"Binary","Dword","ExpandString","MultiString","Qword","String","None"}] String ValueType;
     [Write, Description("Specifies the desired state of the registry policy. When set to 'Present', the registry policy will be created. When set to 'Absent', the registry policy will be removed. Default value is 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
-    [Read, Description("Specifies the path to the pol file being managed.")] String Path;
+    [Read, Description("Returns the path to the pol file being managed.")] String Path;
 };

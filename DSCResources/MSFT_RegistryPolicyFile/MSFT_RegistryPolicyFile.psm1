@@ -46,6 +46,7 @@ function Get-TargetResource
         $AccountName
     )
 
+    Write-Verbose -Message ($script:localizedData.RetrievingCurrentState -f $Key, $ValueName)
     # determine pol file path
     $polFilePath = Get-RegistryPolicyFilePath -TargetType $TargetType -AccountName $AccountName
     $assertPolFile = Test-Path -Path $polFilePath

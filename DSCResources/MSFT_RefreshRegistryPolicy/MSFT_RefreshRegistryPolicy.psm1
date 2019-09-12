@@ -44,6 +44,8 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '',
+        Justification = 'Suppressing this rule because $global:DSCMachineStatus is used to trigger a reboot')]
     [CmdletBinding()]
     param
     (

@@ -1,6 +1,6 @@
 @{
   # Version number of this module.
-  moduleVersion = '1.0.0.0'
+  moduleVersion = '1.0.0'
 
   # ID used to uniquely identify this module
   GUID = 'fcded2c6-6ba2-4d6c-a35e-55848f90462b'
@@ -38,7 +38,7 @@
           ProjectUri = 'https://github.com/dsccommunity/GPRegistryPolicyDsc'
 
           # ReleaseNotes of this module
-        ReleaseNotes = 'Intial release.'
+          ReleaseNotes = 'Intial release.'
 
       } # End of PSData hash table
 

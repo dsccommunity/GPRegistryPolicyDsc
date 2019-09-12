@@ -1,15 +1,3 @@
-################################################################################
-# This is the template for appveyor.yml which uses the "default model" of the
-# test framework in https://github.com/PowerShell/DscResource.Tests.
-#
-# This template assumes you have connected your repository to AppVeyor
-# (https://ci.appveyor.com).
-#
-# Before using it in your repository, modify places marked with 'TODO:', and
-# then remove this comment block.
-################################################################################
-
-
 #---------------------------------#
 #      environment configuration  #
 #---------------------------------#
@@ -26,8 +14,6 @@ environment:
     secure: 9ekJzfsPCDBkyLrfmov83XbbhZ6E2N3z+B/Io8NbDetbHc6hWS19zsDmy7t0Vvxv
 
 install:
-    - ps: |
-        Set-Location -Path $env:APPVEYOR_BUILD_FOLDER
     - git clone https://github.com/PowerShell/DscResource.Tests
     - ps: Write-Verbose -Message "PowerShell version $($PSVersionTable.PSVersion)" -Verbose
     - ps: Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
