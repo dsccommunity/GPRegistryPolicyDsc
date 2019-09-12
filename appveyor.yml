@@ -45,9 +45,6 @@ build: false
 
 test_script:
     - ps: |
-        # TODO:
-        # To use -CodeCovIo parameter, the repository need to connected
-        # to Codecov (see https://codecov.io/).
         Invoke-AppveyorTestScriptTask -CodeCoverage -CodeCovIo
 
 # scripts to run before deployment

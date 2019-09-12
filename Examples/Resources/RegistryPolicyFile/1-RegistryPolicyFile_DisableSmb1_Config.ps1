@@ -18,93 +18,22 @@
 #Requires -module GPRegistryPolicyDsc
 
 <#
-    .SYNOPSIS
-        Configuration that will disabled SMB1.
-
     .DESCRIPTION
         Configuration that will disabled SMB1.
-
-    .PARAMETER Key
-        Indicates the path of the registry key for which you want to ensure a specific state. This path must include the hive.
-
-    .PARAMETER ValueName
-        Indicates the name of the registry value.
-
-    .PARAMETER ValueData
-        The data for the registry value.
-
-    .PARAMETER ValueType
-        Indicates the type of the value.
-
-    .PARAMETER TargetType
-        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, Account.
-
-    .EXAMPLE
-        $configurationParameters = @{
-            Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
-            TargetType = 'ComputerConfiguration'
-            ValueName  = 'SMB1'
-            ValueData  = 0
-            ValueType  = 'DWORD'
-        }
-
-        RegistryPolicyFile_DisableSmb1_Config @configurationParameters
-
-        Compiles a configuration that disables SMB1.
-
-    .EXAMPLE
-        $configurationParameters = @{
-            Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
-            TargetType = 'ComputerConfiguration'
-            ValueName  = 'SMB1'
-            ValueData  = 0
-            ValueType  = 'DWORD'
-        }
-        Start-AzureRmAutomationDscCompilationJob -ResourceGroupName '<resource-group>' -AutomationAccountName '<automation-account>' -ConfigurationName 'DscResourceTemplate_CreateFolderAsSystemConfig' -Parameters $configurationParameters
-
-        Compiles a configuration in Azure Automation disables SMB1
-        Replace the <resource-group> and <automation-account> with correct values.
 #>
 Configuration RegistryPolicyFile_DisableSmb1_Config
 {
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $Key,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $ValueName,
-
-        [Parameter(Mandatory=$true)]
-        [System.String]
-        $TargetType,
-
-        [Parameter()]
-        [System.String]
-        $ValueData,
-
-        [Parameter()]
-        [System.String]
-        $ValueType
-    )
-
     Import-DscResource -ModuleName GPRegistryPolicyDsc
 
     node $NodeName
     {
         RegistryPolicyFile TurnOffSmb1
         {
-            Key        = $Key
-            TargetType = $TargetType
-            ValueName  = $ValueName
-            ValueData  = $ValueData
-            ValueType  = $ValueType
+            Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
+            TargetType = 'ComputerConfiguration'
+            ValueName  = 'SMB1'
+            ValueData  = 0
+            ValueType  = 'DWORD'
         }
 
         RefreshRegistryPolicy RefreashPolicyAfterSMB1
