@@ -86,8 +86,8 @@ A resource to manage registry policy entries in a policy (.pol) file.
 
 #### Parameters
 
-* **`[String]` Key** _(Key)_: Indicates the path of the registry key for which you want to ensure
-      a specific state.
+* **`[String]` Key** _(Key)_: Indicates the path of the registry key
+      for which you want to ensure a specific state.
 * **`[String]` ValueName** _(Required)_: Indicates the name of the registry value.
 * **`[String]` TargetType** _(Required)_: Indicates the target type.
       This is needed to determine the .pol file path.
@@ -98,8 +98,8 @@ A resource to manage registry policy entries in a policy (.pol) file.
 * **`[String]` ValueData** _(Write)_: The data for the registry value.
 * **`[String]` ValueType** _(Write)_: Indicates the type of the value.
 * **`[String]` Ensure** _(Write)_: Specifies the desired state of the registry policy.
-     When set to `'Present'`, the registry policy will be created. When set to `'Absent'`,
-    the registry policy will be removed. Default value is `'Present'`.
+      When set to `'Present'`, the registry policy will be created. When set to `'Absent'`,
+      the registry policy will be removed. Default value is `'Present'`.
 
 #### Read-Only Properties from Get-TargetResource
 
@@ -126,14 +126,15 @@ A resource to detect and invoke a group policy refresh.
 
 #### Parameters
 
-* **`[String]` Name** _(Key)_: A name to serve as the key property. It is not used during configuration.
+* **`[String]` Name** _(Key)_: A name to serve as the key property.
+      It is not used during configuration.
 
 #### Read-Only Properties from Get-TargetResource
 
 * **`[String]` RefreshRequiredKey** _(Read)_: Specifies the value of the
       GPRegistryPolicy key indicating a group policy refresh is needed.
 * **`[String]` Path** _(Read)_: Specifies the path of the RefreshRequired
-      property indicating a group policy refresh is needed.
+       property indicating a group policy refresh is needed.
 
 ## Known issues
 
