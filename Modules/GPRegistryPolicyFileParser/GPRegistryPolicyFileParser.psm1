@@ -22,7 +22,7 @@ function Read-GPRegistryPolicyFile
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true,Position=0)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $Path
     )
@@ -171,11 +171,11 @@ function Assert-Condition
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [System.Boolean]
         $Condition,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $ErrorMessage
@@ -212,24 +212,24 @@ function New-GPRegistryPolicy
     [OutputType([GPRegistryPolicy])]
     param
     (
-        [Parameter(Mandatory=$true,Position=0)]
+        [Parameter(Mandatory = $true,Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
         $Key,
         
-        [Parameter(Position=1)]
+        [Parameter(Position = 1)]
         [string]
         $ValueName = $null,
         
-        [Parameter(Position=2)]
+        [Parameter(Position = 2)]
         [RegType]
         $ValueType = [RegType]::REG_NONE,
         
-        [Parameter(Position=3)]
+        [Parameter(Position = 3)]
         [string]
         $ValueLength = $null,
         
-        [Parameter(Position=4)]
+        [Parameter(Position = 4)]
         [object[]]
         $ValueData = $null
     )
@@ -286,7 +286,7 @@ function New-GPRegistrySettingsEntry
     [OutputType([byte[]])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [Alias("Policy")]
         [GPRegistryPolicy[]]
         $RegistryPolicy
@@ -370,11 +370,11 @@ function Set-GPRegistryPolicyFileEntry
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Path,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [GPRegistryPolicy]
         $RegistryPolicy
     )
@@ -404,7 +404,6 @@ function Set-GPRegistryPolicyFileEntry
     $desiredEntries += $RegistryPolicy
 
     # convert entries to byte array
-    #$desiredEntriesCollection = New-GPRegistrySettingsEntry -RegistryPolicy $desiredEntries
 
     New-GPRegistryPolicyFile -Path $Path
 
@@ -431,11 +430,11 @@ function Remove-GPRegistryPolicyFileEntry
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Path,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [GPRegistryPolicy]
         $RegistryPolicy
     )
@@ -482,9 +481,9 @@ function Convert-StringToInt
     [OutputType([int[]])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [System.Object[]]
+        [System.Object]
         $ValueString
     )
   
@@ -555,22 +554,14 @@ function Format-MultiStringValue
     $result = @()
     if ($MultiStringValue -match '\0')
     {
-        [System.Collections.ArrayList] $array = $MultiStringValue -split '\0'
-        # Remove the index with the terminating \0\0
-        $array.RemoveAt($array.Count -1)
-        $lastItem = $array[-1]
+        [System.Collections.ArrayList] $array = $MultiStringValue.TrimEnd([char]0) -split '\0'
 
         # Remove the terminating \0 from all indexes
         foreach ($item in $array)
         {
-            if ($item -eq $lastItem)
-            {
-                $result += $item
-                continue
-            }
-
-            $result += $item.Substring(0,$item.Length-1)
+            $result += $item.TrimEnd([char]0)
         }
+
         return $result
     }
     else
@@ -578,9 +569,6 @@ function Format-MultiStringValue
         # If no terminating 0's are found split on whitespace
         return (-split $MultiStringValue)
     }
-    
-
-
 }
 
 Enum RegType
