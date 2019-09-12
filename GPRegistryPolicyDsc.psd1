@@ -18,7 +18,7 @@
   Description = 'This resource module contains resources used to apply and manage local group policies by modifying the respective .pol file.'
 
   # Minimum version of the Windows PowerShell engine required by this module
-  PowerShellVersion = '4.0'
+  PowerShellVersion = '5.0'
 
   # Minimum version of the common language runtime (CLR) required by this module
   CLRVersion = '4.0'
@@ -43,18 +43,4 @@
       } # End of PSData hash table
 
   } # End of PrivateData hash table
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

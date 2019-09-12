@@ -84,7 +84,7 @@ Configuration RegistryPolicyFile_DisableSmb1_Config
         [Parameter(Mandatory=$true)]
         [ValidateSet('ComputerConfiguration','UserConfiguration','Administrators','NonAdministrators','Account')]
         [System.String]
-        $TargetType,
+        $TargetType = 'ComputerConfiguration',
 
         [Parameter()]
         [System.String]
@@ -93,7 +93,7 @@ Configuration RegistryPolicyFile_DisableSmb1_Config
         [Parameter()]
         [ValidateSet('Binary','Dword','ExpandString','MultiString','Qword','String','None')]
         [System.String]
-        $ValueType
+        $ValueType = 'Dword'
     )
 
     Import-DscResource -ModuleName GPRegistryPolicyDsc

@@ -160,9 +160,9 @@ function Set-TargetResource
     )
 
     $getTargetResourceParameters = @{
-        Key        = $Key
-        TargetType = $TargetType
-        ValueName  = $ValueName
+        Key         = $Key
+        TargetType  = $TargetType
+        ValueName   = $ValueName
         AccountName = $AccountName
     }
 
