@@ -111,7 +111,6 @@ InModuleScope 'GPRegistryPolicyFileParser' {
 
             $entryToRemoveParameters = $newRegistryPolicyParameters.Clone()
             $entryToRemoveParameters.ValueName = 'ValueName2'
-            # create a pol file and add entries to test against
             New-GPRegistryPolicyFile -Path $polFilePath
             $predictedResult = New-GPRegistryPolicy @newRegistryPolicyParameters
             $entryToRemove = New-GPRegistryPolicy @entryToRemoveParameters
@@ -187,6 +186,9 @@ InModuleScope 'GPRegistryPolicyFileParser' {
 
         Context 'When ValueType is Dword' {
             BeforeEach {
+                $registryEntryParameters = $registryEntryParameters.Clone()
+                $registryEntryParameters.ValueType = 'REG_DWORD'
+                $registryEntryParameters.ValueData = '1024'
                 $registryPolicyEntry = New-GPRegistryPolicy @registryEntryParameters
                 Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $registryPolicyEntry
             }
@@ -203,6 +205,9 @@ InModuleScope 'GPRegistryPolicyFileParser' {
 
         Context 'When ValueType is ExpandString' {
             BeforeEach {
+                $registryEntryParameters = $registryEntryParameters.Clone()
+                $registryEntryParameters.ValueType = 'REG_EXPAND_SZ'
+                $registryEntryParameters.ValueData = 'ThisIsAnExpandString'
                 $registryPolicyEntry = New-GPRegistryPolicy @registryEntryParameters
                 Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $registryPolicyEntry
             }
@@ -219,6 +224,9 @@ InModuleScope 'GPRegistryPolicyFileParser' {
 
         Context 'When ValueType is Qword' {
             BeforeEach {
+                $registryEntryParameters = $registryEntryParameters.Clone()
+                $registryEntryParameters.ValueType = 'REG_QWORD'
+                $registryEntryParameters.ValueData = '1024'
                 $registryPolicyEntry = New-GPRegistryPolicy @registryEntryParameters
                 Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $registryPolicyEntry
             }
@@ -235,6 +243,9 @@ InModuleScope 'GPRegistryPolicyFileParser' {
 
         Context 'When ValueType is String' {
             BeforeEach {
+                $registryEntryParameters = $registryEntryParameters.Clone()
+                $registryEntryParameters.ValueType = 'REG_SZ'
+                $registryEntryParameters.ValueData = 'ThisIsAString'
                 $registryPolicyEntry = New-GPRegistryPolicy @registryEntryParameters
                 Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $registryPolicyEntry
             }
@@ -247,6 +258,75 @@ InModuleScope 'GPRegistryPolicyFileParser' {
                 $results.ValueData | Should -Be $registryPolicyEntry.ValueData
                 $results.ValueType | Should -Be $registryPolicyEntry.ValueType
             }
+        }
+    }
+
+    Describe 'New-GPRegistryPolicy' -Tag 'NewGPRegistryPolicy' {
+        BeforeAll {
+            $registryEntryParameters = @{
+                Key        = 'SYSTEM\CurrentControlSet\PesterTest'
+                ValueName  = 'ValueName1'
+                ValueData  = 'Value1'
+                ValueType  = 'REG_SZ'
+            }
+        }
+
+        Context 'Validate proper type is returned' {
+            BeforeEach {
+                $registryPolicyEntry = New-GPRegistryPolicy @registryEntryParameters
+            }
+
+            It 'Should return type of GPRegistryPolicy' {
+                $registryPolicyEntry -is [GPRegistryPolicy] | Should -BeTrue 
+            }
+        }
+    }
+
+    Describe 'New-GPRegistryPolicyFile' -Tag 'NewGPRegistryPolicyFile' {
+        BeforeAll {
+            $polFilePath = 'TestDrive:\Registry.pol'
+        }
+
+        Context 'Creating a new pol file' {
+            BeforeEach {
+                New-GPRegistryPolicyFile -Path $polFilePath
+            }
+
+            It 'Should have the correct file heading' {
+                $fileHeader = Format-Hex -Path $polFilePath | Select-Object -First 1
+                $fileHeader -cmatch 'PReg' | Should -BeTrue
+            }
+        }
+    }
+
+    Describe 'Set-GPRegistryPolicyFileEntry' -Tag 'SetGPRegistryPolicyFileEntry' {
+        BeforeAll {
+            $polFilePath = 'TestDrive:\Registry.pol'
+
+            $newRegistryPolicyParameters = @{
+                Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
+                ValueName  = 'ValueName1'
+                ValueData  = 0
+                ValueType  = 'REG_DWORD'
+            }
+        }
+
+        Context 'Adding an entry to a pol file' {
+            BeforeEach {
+                New-GPRegistryPolicyFile -Path $polFilePath
+                $registryPolicyToAdd = New-GPRegistryPolicy @newRegistryPolicyParameters
+            }
+
+            It 'Should add the registry policy to the pol file' {
+                Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $registryPolicyToAdd
+                $result = Read-GPRegistryPolicyFile -Path $polFilePath
+
+                $result.Key       | Should -Be $registryPolicyToAdd.Key
+                $result.ValueName | Should -Be $registryPolicyToAdd.ValueName
+                $result.ValueData | Should -Be $registryPolicyToAdd.ValueData
+                $result.ValueType | Should -Be $registryPolicyToAdd.ValueType
+            }
+
         }
     }
 }
