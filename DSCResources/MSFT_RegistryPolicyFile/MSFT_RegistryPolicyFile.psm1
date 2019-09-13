@@ -226,6 +226,8 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '',
+        Justification = 'Useful verbose information is provided by the Test-DscParameterState helper function.')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param

@@ -25,7 +25,7 @@ Configuration RegistryPolicyFile_DisableSmb1_Config
 {
     Import-DscResource -ModuleName GPRegistryPolicyDsc
 
-    node $NodeName
+    node localhost
     {
         RegistryPolicyFile TurnOffSmb1
         {
