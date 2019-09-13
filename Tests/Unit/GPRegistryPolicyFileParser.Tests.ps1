@@ -41,6 +41,12 @@ InModuleScope 'GPRegistryPolicyFileParser' {
     }
 
     Describe 'Get-ByteStreamParameter' -Tag 'GetByteStreamParameter' {
+        BeforeAll {
+            $powerShellEdition = $PSVersionTable.PSEdition
+        }
+        AfterEach {
+            $PSVersionTable.PSEdition = $powerShellEdition
+        }
         Context 'When on Windows PowerShell' {
             BeforeEach {
                 $predictedResult = @{
@@ -100,7 +106,7 @@ InModuleScope 'GPRegistryPolicyFileParser' {
     }
 
     Describe 'Remove-GPRegistryPolicyFileEntry' -Tag 'RemoveGPRegistryPolicyFileEntry' {
-        BeforeEach {
+        BeforeAll {
             $polFilePath = 'TestDrive:\Registry.pol'
             $newRegistryPolicyParameters = @{
                 Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
@@ -108,7 +114,9 @@ InModuleScope 'GPRegistryPolicyFileParser' {
                 ValueData  = 0
                 ValueType  = 'REG_DWORD'
             }
+        }
 
+        Context 'Removing a policy from a pol file' {
             $entryToRemoveParameters = $newRegistryPolicyParameters.Clone()
             $entryToRemoveParameters.ValueName = 'ValueName2'
             New-GPRegistryPolicyFile -Path $polFilePath
@@ -117,20 +125,21 @@ InModuleScope 'GPRegistryPolicyFileParser' {
 
             Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $predictedResult
             Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $entryToRemove
-        }
+            
 
-        It 'Should contain the policy to be removed' {
-            $result = Read-GPRegistryPolicyFile -Path $polFilePath |
-                Where-Object -FilterScript {$PSItem.ValueName -eq $entryToRemoveParameters.ValueName}
+            It 'Should contain the policy to be removed' {
+                $result = Read-GPRegistryPolicyFile -Path $polFilePath |
+                    Where-Object -FilterScript {$PSItem.ValueName -eq $entryToRemoveParameters.ValueName}
 
-            $result.ValueName | Should -Be $entryToRemoveParameters.ValueName
-        }
+                $result.ValueName | Should -Be $entryToRemoveParameters.ValueName
+            }
 
-        It 'Should remove the entryToRemove' {
-            Remove-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $entryToRemove
-            $result = Read-GPRegistryPolicyFile -Path $polFilePath
+            It 'Should remove the entryToRemove' {
+                Remove-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $entryToRemove
+                $result = Read-GPRegistryPolicyFile -Path $polFilePath
 
-            $result.ValueName | Should -Be $newRegistryPolicyParameters.ValueName
+                $result.ValueName | Should -Be $newRegistryPolicyParameters.ValueName
+            }
         }
     }
 
@@ -326,7 +335,77 @@ InModuleScope 'GPRegistryPolicyFileParser' {
                 $result.ValueData | Should -Be $registryPolicyToAdd.ValueData
                 $result.ValueType | Should -Be $registryPolicyToAdd.ValueType
             }
+        }
+    }
 
+    Describe 'New-GPRegistrySettingsEntry' -Tag 'NewGPRegistrySettingsEntry' {
+        BeforeAll {
+            $registryPolicyDefaultParameters = @{
+                Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
+                ValueName  = 'ValueName1'
+                ValueData  = ''
+                ValueType  = ''
+            }
+        }
+
+        Context 'When dataType is a string' {
+            BeforeEach {
+                $newRegistryPolicyParameters = $registryPolicyDefaultParameters.Clone()
+            }
+
+            It 'Should return the correct STRING valueData result' {
+                $newRegistryPolicyParameters.ValueData = 'String'
+                $newRegistryPolicyParameters.ValueType = 'REG_SZ'
+                $newRegistryPolicy = New-GPRegistryPolicy @newRegistryPolicyParameters
+                $result = New-GPRegistrySettingsEntry -RegistryPolicy $newRegistryPolicy
+                $resultString = (([System.Text.Encoding]::unicode.GetString($result) -replace '\[|\]') -split ';')[-1]
+                $resultString | Should -Be $newRegistryPolicyParameters.ValueData
+            }
+
+            It 'Should return the correct BINARY valueData result' {
+                $newRegistryPolicyParameters.ValueData = '0'
+                $newRegistryPolicyParameters.ValueType = 'REG_BINARY'
+                $newRegistryPolicy = New-GPRegistryPolicy @newRegistryPolicyParameters
+                $result = New-GPRegistrySettingsEntry -RegistryPolicy $newRegistryPolicy
+                $resultString = (([System.Text.Encoding]::unicode.GetString($result) -replace '\[|\]') -split ';')[-1]
+                $resultString | Should -Be $newRegistryPolicyParameters.ValueData
+            }
+
+            It 'Should return the correct DWORD valueData result' {
+                $newRegistryPolicyParameters.ValueData = '1024'
+                $newRegistryPolicyParameters.ValueType = 'REG_DWORD'
+                $newRegistryPolicy = New-GPRegistryPolicy @newRegistryPolicyParameters
+                $result = New-GPRegistrySettingsEntry -RegistryPolicy $newRegistryPolicy
+                $resultString = (([System.Text.Encoding]::unicode.GetString($result) -replace '\[|\]') -split ';')[-1]
+                Convert-StringToInt -ValueString $resultString | Should -Be $newRegistryPolicyParameters.ValueData
+            }
+
+            It 'Should return the correct QWORD valueData result' {
+                $newRegistryPolicyParameters.ValueData = '10245'
+                $newRegistryPolicyParameters.ValueType = 'REG_QWORD'
+                $newRegistryPolicy = New-GPRegistryPolicy @newRegistryPolicyParameters
+                $result = New-GPRegistrySettingsEntry -RegistryPolicy $newRegistryPolicy
+                $resultString = (([System.Text.Encoding]::unicode.GetString($result) -replace '\[|\]') -split ';')[-1]
+                Convert-StringToInt -ValueString $resultString | Should -Be $newRegistryPolicyParameters.ValueData
+            }
+        }
+    }
+
+    Describe 'Assert-Condition' -Tag 'AssertCondition' {
+        BeforeAll {
+                $message   = 'ErrorOccured'
+        }
+
+        Context 'When condition is TRUE' {
+            It 'Should not throw' {
+                {Assert-Condition -Condition $true -ErrorMessage $message} | Should -Not -Throw
+            }
+        }
+
+        Context 'When condition is FALSE' {
+            It 'Should not throw' {
+                {Assert-Condition -Condition $false -ErrorMessage $message} | Should -Throw
+            }
         }
     }
 }

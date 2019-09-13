@@ -22,5 +22,3 @@ coverage:
         # and let codecov.io set the goal for the code changed in the patch.
         target: auto
         threshold: 5
-ignore:
-  "Modules/GPRegistryPolicyFileParser/.*"
