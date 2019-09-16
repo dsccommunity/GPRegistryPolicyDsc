@@ -48,11 +48,11 @@ try
                 BeforeEach {
                     Mock -CommandName Get-RegistryPolicyFilePath -MockWith {
                         'C:\Windows\System32\GroupPolicy\Machine\registry.pol'
-                    } -Verifiable
+                    }
 
                     Mock -CommandName Test-Path -MockWith {
                         $true
-                    } -Verifiable
+                    }
 
                     $registryPolicyParameters = @{
                         Key       = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
@@ -76,24 +76,21 @@ try
                     Assert-MockCalled Read-GPRegistryPolicyFile -Exactly -Times 1 -Scope It
                 }
 
-                It 'Should return the same values as passed as parameters' {
+                It 'Should return the correct values to reflect key is absent' {
                     $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
+
+                    $getTargetResourceResult.Key | Should $registryPolicyParameters.Key
+                    $getTargetResourceResult.ValueName | Should $registryPolicyParameters.ValueName
+                    $getTargetResourceResult.TargetType | Should $registryPolicyParameters.TargetType
                     $getTargetResourceResult.Path | Should -Be 'C:\Windows\System32\GroupPolicy\Machine\registry.pol'
-                    $getTargetResourceResult.TargetType | Should -Be $getTargetResourceParameters.TargetType
-                }
-
-                It 'Should return $false or $null respectively for the rest of the properties' {
-                    $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
-
-                    $getTargetResourceResult.Key | Should -BeNullOrEmpty
                     $getTargetResourceResult.ValueData | Should -BeNullOrEmpty
                     $getTargetResourceResult.ValueType | Should -BeNullOrEmpty
-                    $getTargetResourceResult.ValueName | Should -BeNullOrEmpty
                 }
             }
 
             Context 'When the configuration is present' {
                 BeforeAll {
+                    $polPath = 'C:\Windows\System32\GroupPolicyUsers\S-1-5-21-3318452954-581252911-2334442305-1001\User\Registry.pol'
                     $defaultParameters = @{
                         Key        = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
                         ValueName  = 'SMB1'
@@ -104,12 +101,12 @@ try
     
                 BeforeEach {
                     Mock -CommandName Get-RegistryPolicyFilePath -MockWith {
-                        'C:\Windows\System32\GroupPolicyUsers\S-1-5-21-3318452954-581252911-2334442305-1001\User\Registry.pol'
-                    } -Verifiable
+                        $polPath
+                    }
 
                     Mock -CommandName Test-Path -MockWith {
                         $true
-                    } -Verifiable
+                    }
 
                     $registryPolicyParameters = @{
                         Key       = 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
@@ -124,7 +121,7 @@ try
 
                     Mock -CommandName ConvertTo-NTAccountName -MockWith {
                         'User1'
-                    } -Verifiable
+                    }
                 }
 
                 It 'Should return the state as present' {
@@ -143,6 +140,8 @@ try
                     $getTargetResourceResult.ValueName | Should -Be $getTargetResourceParameters.ValueName
                     $getTargetResourceResult.ValueData | Should -Be 1
                     $getTargetResourceResult.AccountName | Should -Be 'User1'
+                    $getTargetResourceResult.TargetType | Should -Be 'Account'
+                    $getTargetResourceResult.Path | Should -Be $polPath
                 }
             }
         }
@@ -175,7 +174,7 @@ try
                     BeforeAll {
                         Mock -CommandName Get-TargetResource -MockWith {
                             $getTargetResourceResults
-                        } -Verifiable
+                        }
                     }
 
                     BeforeEach {
@@ -199,7 +198,7 @@ try
 
                         Mock -CommandName Get-TargetResource -MockWith {
                             return $getTargetResourceResults
-                        } -Verifiable
+                        }
                     }
 
                     It 'Should return the $true' {
@@ -209,8 +208,6 @@ try
                         Assert-MockCalled Get-TargetResource -Exactly -Times 1 -Scope It
                     }
                 }
-
-                Assert-VerifiableMock
             }
 
             Context 'When the system is not in the desired state' {
@@ -224,7 +221,7 @@ try
                     It 'Should return the $false' {
                         Mock -CommandName Get-TargetResource -MockWith {
                             $getTargetResourceResults
-                        } -Verifiable
+                        }
 
                         $testTargetResourceResult = Test-TargetResource @testTargetResourceParameters
                         $testTargetResourceResult | Should -Be $false
@@ -241,14 +238,12 @@ try
                     It 'Should return the $false' {
                         Mock -CommandName Get-TargetResource -MockWith {
                             $getTargetResourceResults
-                        } -Verifiable
+                        }
 
                         $testTargetResourceResult = Test-TargetResource @testTargetResourceParameters
                         $testTargetResourceResult | Should -Be $false
                     }
                 }
-
-                Assert-VerifiableMock
             }
         }
 
@@ -268,13 +263,13 @@ try
                     $ValueName -eq $setTargsetTargetResourceParameters.ValueName -and
                     $ValueData -eq $setTargsetTargetResourceParameters.ValueData -and
                     $ValueType -eq 'REG_DWORD'
-                } -Verifiable
+                }
 
                 Mock -CommandName New-GPRegistryPolicyFile -ParameterFilter {
                     $Path -eq $polFilePath
-                } -Verifiable
+                }
 
-                Mock -CommandName Set-GPRegistryPolicyFileEntry -Verifiable
+                Mock -CommandName Set-GPRegistryPolicyFileEntry
 
                 $polFilePath = "C:\Windows\System32\GroupPolicy\Machine\registry.pol"
                 Mock -CommandName Set-RefreshRegistryKey
@@ -290,14 +285,14 @@ try
                         return @{
                             Ensure = 'Present'
                         }
-                    } -Verifiable
+                    }
 
-                    Mock -CommandName Remove-GPRegistryPolicyFileEntry -Verifiable
+                    Mock -CommandName Remove-GPRegistryPolicyFileEntry
 
                     Mock -CommandName Get-RegistryPolicyFilePath -ParameterFilter {
                         $TargetType -eq $setTargetResourceParameters.TargetType -and
                         $null -eq $AccountName
-                    } -Verifiable
+                    }
                 }
 
                 BeforeEach {
@@ -318,9 +313,9 @@ try
                         return @{
                             Ensure = 'Absent'
                         }
-                    } -Verifiable
+                    }
 
-                    Mock -CommandName Test-Path -MockWith {$false} -Verifiable
+                    Mock -CommandName Test-Path -MockWith {$false}
                 }
 
                 BeforeEach {
@@ -333,6 +328,7 @@ try
                     Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 1 -Scope 'It'
                     Assert-MockCalled -CommandName Set-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
                     Assert-MockCalled -CommandName Set-RefreshRegistryKey -Exactly -Times 1 -Scope 'It'
+                    Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 0 -Scope 'It'
                 }
             }
 
@@ -340,11 +336,11 @@ try
                 BeforeAll {
                     Mock -CommandName Get-TargetResource -MockWith {
                         return @{
-                            Ensure = 'Absent'
+                            Ensure = 'Present'
                         }
-                    } -Verifiable
+                    }
 
-                    Mock -CommandName Test-Path -MockWith {$true} -Verifiable
+                    Mock -CommandName Test-Path -MockWith {$true}
                 }
 
                 It 'Should call the correct mocks' {
@@ -404,6 +400,20 @@ try
                     $result = ConvertTo-NTAccountName -SecurityIdentifier 'S-1-5-32-544'
                     $result | Should -Be 'BUILTIN\Administrators'
                 }
+            }
+        }
+
+        Describe 'MSFT_RegistryPolicyFile\Set-RefreshRegistryKey' -Tag 'SetRefreshRegistryKey' {
+            BeforeAll {
+                Mock -CommandName New-Item
+                Mock -CommandName New-ItemProperty
+            }
+
+            Context 'When setting a registry key to indicate a group policy refresh is needed' {
+                {Set-RefreshRegistryKey | Should -Not -Throw}
+
+                Assert-MockCalled -CommandName New-Item -Times 1 -Exactly
+                Assert-MockCalled -CommandName New-ItemProperty -Times 1 - -Exactly
             }
         }
     }

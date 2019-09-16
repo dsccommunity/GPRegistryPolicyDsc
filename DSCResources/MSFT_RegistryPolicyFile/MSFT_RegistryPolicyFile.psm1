@@ -88,8 +88,8 @@ function Get-TargetResource
 
     # return the results
     $getTargetResourceResult = @{
-        Key         = $currentResults.Key
-        ValueName   = $currentResults.ValueName
+        Key         = $Key
+        ValueName   = $ValueName
         ValueData   = [string[]] $currentResults.ValueData
         ValueType   = $valueTypeResult
         TargetType  = $TargetType

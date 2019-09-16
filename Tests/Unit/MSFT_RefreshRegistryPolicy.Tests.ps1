@@ -140,7 +140,6 @@ try
 
                 It 'Should return the correct values' {
                     $results = Read-GPRefreshRegistryKey
-
                     $results.Name | Should -Be 'RefreshRequired'
                     $results.Value | Should -Be 1
                 }
