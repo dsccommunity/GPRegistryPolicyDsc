@@ -41,8 +41,9 @@ Configuration RegistryPolicyFile_DisableDesktopChanges_Config
 
         RefreshRegistryPolicy RefreashPolicyAfterDisableDesktopChanges
         {
-            Name      = 'RefreashPolicyAfterDisableDesktopChanges'
-            DependsOn = '[RegistryPolicyFile]DisableDesktopChanges'
+            Name             = 'RefreashPolicyAfterDisableDesktopChanges'
+            IsSingleInstance = 'Yes'
+            DependsOn        = '[RegistryPolicyFile]DisableDesktopChanges'
         }
     }
 }

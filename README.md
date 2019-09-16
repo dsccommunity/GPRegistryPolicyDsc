@@ -86,8 +86,10 @@ A resource to detect and invoke a group policy refresh.
 
 #### Parameters
 
-* **`[String]` Name** _(Key)_: A name to serve as the key property.
+* **`[String]` Name** _(Required)_: A name to serve as the key property.
       It is not used during configuration.
+* **`[String]` IsSingleInstance** _(Key)_: Specifies the resource is a single
+      instance, the value must be 'Yes'
 
 #### Read-Only Properties from Get-TargetResource
 

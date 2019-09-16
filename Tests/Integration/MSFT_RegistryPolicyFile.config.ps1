@@ -125,7 +125,8 @@ Configuration MSFT_RegistryPolicyFile_LanmanServices_Config
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_LanmanServices'
         {
-            Name = 'RefreshPolicyAfterLanmanServices'
+            Name             = 'RefreshPolicyAfterLanmanServices'
+            IsSingleInstance = 'Yes'
         }
     }
 }
@@ -152,7 +153,8 @@ Configuration MSFT_RegistryPolicyFile_ForcedTunneling_Config
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_ForcedTunneling'
         {
-            Name = 'RefreshPolicyAfterForcedTunneling'
+            Name             = 'RefreshPolicyAfterForcedTunneling'
+            IsSingleInstance = 'Yes'
         }
     }
 }

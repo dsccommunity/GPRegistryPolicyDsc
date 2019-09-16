@@ -43,8 +43,9 @@ Configuration RefreshRegistryPolicy_DisableSmb1_Config
 
         RefreshRegistryPolicy RefreashPolicyAfterSMB1
         {
-            Name      = 'RefreashPolicyAfterSMB1'
-            DependsOn = '[RegistryPolicyFile]TurnOffSmb1'
+            Name             = 'RefreashPolicyAfterSMB1'
+            IsSingleInstance = 'Yes'
+            DependsOn        = '[RegistryPolicyFile]TurnOffSmb1'
         }
     }
 }

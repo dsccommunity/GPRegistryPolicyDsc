@@ -19,6 +19,11 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
+        [parameter(Mandatory = $true)]
+        [ValidateSet('Yes')]
+        [String]
+        $IsSingleInstance,
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name
@@ -30,6 +35,7 @@ function Get-TargetResource
 
     return @{
         Name               = $Name
+        $IsSingleInstance = 'Yes'
         Path               = $refreshKeyValue.Path
         RefreshRequiredKey = $refreshKeyValue.Value
     }
@@ -46,9 +52,16 @@ function Set-TargetResource
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '',
         Justification = 'Suppressing this rule because $global:DSCMachineStatus is used to trigger a reboot')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '',
+        Justification = 'Suppressing this rule because $global:DSCMachineStatus is used to trigger a reboot')]
     [CmdletBinding()]
     param
     (
+        [parameter(Mandatory = $true)]
+        [ValidateSet('Yes')]
+        [String]
+        $IsSingleInstance,
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name
@@ -80,12 +93,17 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
+        [parameter(Mandatory = $true)]
+        [ValidateSet('Yes')]
+        [String]
+        $IsSingleInstance,
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name
     )
 
-    $getTargetResourceResult = Get-TargetResource -Name $Name
+    $getTargetResourceResult = Get-TargetResource @PSBoundParameters
 
     if ($getTargetResourceResult.RefreshRequiredKey -ne 1)
     {
