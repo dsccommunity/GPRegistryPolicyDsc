@@ -94,12 +94,12 @@ InModuleScope 'GPRegistryPolicyFileParser' {
             $result | Should -Be $predictedResult
         }
 
-        It ' Should return the correct int32' {
+        It 'Should return the correct type int32' {
             $result = Convert-StringToInt -ValueString $shouldBeInt32
             $result | Should -BeOfType [int32]
         }
 
-        It ' Should return the correct int32' {
+        It 'Should return the correct type int64' {
             $result = Convert-StringToInt -ValueString $shouldBeInt64
             $result | Should -BeOfType [int64]
         }
@@ -117,15 +117,16 @@ InModuleScope 'GPRegistryPolicyFileParser' {
         }
 
         Context 'Removing a policy from a pol file' {
-            $entryToRemoveParameters = $newRegistryPolicyParameters.Clone()
-            $entryToRemoveParameters.ValueName = 'ValueName2'
-            New-GPRegistryPolicyFile -Path $polFilePath
-            $predictedResult = New-GPRegistryPolicy @newRegistryPolicyParameters
-            $entryToRemove = New-GPRegistryPolicy @entryToRemoveParameters
+            BeforeAll {
+                $entryToRemoveParameters = $newRegistryPolicyParameters.Clone()
+                $entryToRemoveParameters.ValueName = 'ValueName2'
+                New-GPRegistryPolicyFile -Path $polFilePath
+                $predictedResult = New-GPRegistryPolicy @newRegistryPolicyParameters
+                $entryToRemove = New-GPRegistryPolicy @entryToRemoveParameters
 
-            Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $predictedResult
-            Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $entryToRemove
-            
+                Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $predictedResult
+                Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $entryToRemove
+            }
 
             It 'Should contain the policy to be removed' {
                 $result = Read-GPRegistryPolicyFile -Path $polFilePath |
@@ -156,13 +157,13 @@ InModuleScope 'GPRegistryPolicyFileParser' {
             New-GPRegistryPolicyFile -Path $polFilePath
         }
 
-        Context 'When ValueType is mutiString' {
+        Context 'When ValueType is mutliString' {
             BeforeEach {
                 $registryPolicyEntry = New-GPRegistryPolicy @registryEntryParameters
                 Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $registryPolicyEntry
             }
 
-            It 'Should return the correct mutiString results' {
+            It 'Should return the correct mutliString results' {
                 $results = Read-GPRegistryPolicyFile -Path $polFilePath
 
                 $results.Key       | Should -Be $registryPolicyEntry.Key
@@ -286,7 +287,11 @@ InModuleScope 'GPRegistryPolicyFileParser' {
             }
 
             It 'Should return type of GPRegistryPolicy' {
-                $registryPolicyEntry -is [GPRegistryPolicy] | Should -BeTrue 
+                $registryPolicyEntry -is [GPRegistryPolicy] | Should -BeTrue                
+                $registryPolicyEntry.Key | Should -Be $registryEntryParameters.Key
+                $registryPolicyEntry.ValueName | Should -Be $registryEntryParameters.ValueName
+                $registryPolicyEntry.ValueData | Should -Be $registryEntryParameters.ValueData
+                $registryPolicyEntry.ValueType | Should -Be $registryEntryParameters.ValueType
             }
         }
     }

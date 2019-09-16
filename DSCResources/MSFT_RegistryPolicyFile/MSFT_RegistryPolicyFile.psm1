@@ -18,6 +18,9 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_RegistryPolicyFile
     .PARAMETER ValueName
         Indicates the name of the registry value.
 
+    .PARAMETER TargetType
+        Indicates the target type. This is needed to determine the .pol file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, Account.
+
     .PARAMETER AccountName
         Specifies the name of the account for an user specific pol file to be managed.
 #>
@@ -35,7 +38,7 @@ function Get-TargetResource
         [System.String]
         $ValueName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('ComputerConfiguration','UserConfiguration','Administrators','NonAdministrators','Account')]
         [System.String]
         $TargetType,
@@ -70,7 +73,7 @@ function Get-TargetResource
     }
 
     # resolve account name
-    $polFilePathArray = ($polFilePath -split '\\')
+    $polFilePathArray = $polFilePath -split '\\'
     $system32Index = $polFilePathArray.IndexOf('System32')
     $accountNameFromPath = $polFilePathArray[$system32Index+2]
 
@@ -87,7 +90,7 @@ function Get-TargetResource
     $getTargetResourceResult = @{
         Key         = $currentResults.Key
         ValueName   = $currentResults.ValueName
-        ValueData   = [string[]]$currentResults.ValueData
+        ValueData   = [string[]] $currentResults.ValueData
         ValueType   = $valueTypeResult
         TargetType  = $TargetType
         Ensure      = $ensureResult
@@ -136,7 +139,7 @@ function Set-TargetResource
         [System.String]
         $ValueName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('ComputerConfiguration','UserConfiguration','Administrators','NonAdministrators','Account')]
         [System.String]
         $TargetType,
@@ -240,7 +243,7 @@ function Test-TargetResource
         [System.String]
         $ValueName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('ComputerConfiguration','UserConfiguration','Administrators','NonAdministrators','Account')]
         [System.String]
         $TargetType,
@@ -292,6 +295,7 @@ function Test-TargetResource
     {
         if ($Ensure -eq $getTargetResourceResult.Ensure)
         {
+            Write-Verbose -Message ($script:localizedData.InDesiredState)
             $testTargetResourceResult = $true
         }
     }
@@ -315,7 +319,7 @@ function Get-RegistryPolicyFilePath
     [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("ComputerConfiguration","UserConfiguration","Administrators","NonAdministrators","Account")]
         [System.String]
         $TargetType,
@@ -368,13 +372,13 @@ function ConvertTo-SecurityIdentifier
     [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $AccountName
     )
 
     Write-Verbose -Message ($script:localizedData.TranslatingNameToSid -f $AccountName)
-    $id = [System.Security.Principal.NTAccount]$AccountName
+    $id = [System.Security.Principal.NTAccount] $AccountName
 
     return $id.Translate([System.Security.Principal.SecurityIdentifier]).Value
 }
@@ -392,12 +396,12 @@ function ConvertTo-NTAccountName
     [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.Security.Principal.SecurityIdentifier]
         $SecurityIdentifier
     )
 
-    $identiy = [System.Security.Principal.SecurityIdentifier]$SecurityIdentifier
+    $identiy = [System.Security.Principal.SecurityIdentifier] $SecurityIdentifier
 
     return $identiy.Translate([System.Security.Principal.NTAccount]).Value
 }

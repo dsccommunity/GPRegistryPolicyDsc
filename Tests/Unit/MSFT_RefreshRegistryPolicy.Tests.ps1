@@ -42,13 +42,13 @@ try
 
             Context 'When the system is in the desired state' {
                 BeforeEach {
-                    Mock -CommandName Read-GPRefreshRegistryKey -MockWith {}
+                    Mock -CommandName Read-GPRefreshRegistryKey
                 }
 
                 It 'Should return the proper registry key property values' {
                     $getTargetResourceResult = Get-TargetResource -Name 'Test'
-                    $getTargetResourceResult.Path | Should -Be $null
-                    $getTargetResourceResult.RefreshRequiredKey | Should -Be $null
+                    $getTargetResourceResult.Path | Should -BeNullOrEmpty
+                    $getTargetResourceResult.RefreshRequiredKey | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Read-GPRefreshRegistryKey -Exactly -Times 1 -Scope It
                 }
@@ -84,7 +84,7 @@ try
 
             Context 'When the system is not in the desired state' {
                 It 'Should should call Invoke-Command' {
-                    Set-TargetResource -Name 'Test'
+                    { Set-TargetResource -Name 'Test' } | Should -Not -Throw
                     Assert-MockCalled -CommandName Invoke-Command -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Remove-Item -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Write-Warning -Exactly -Times 1 -Scope It
@@ -107,7 +107,7 @@ try
 
                 It 'Should return $true' {
                     $testTargetResourceResult = Test-TargetResource -Name 'Test'
-                    $testTargetResourceResult | Should -Be $true
+                    $testTargetResourceResult | Should -BeTrue
                 }
             }
 
@@ -120,7 +120,29 @@ try
 
                 It 'Should return $false' {
                     $testTargetResourceResult = Test-TargetResource -Name 'Test'
-                    $testTargetResourceResult | Should -Be $false
+                    $testTargetResourceResult | Should -BeFalse
+                }
+            }
+        }
+
+        Describe 'MSFT_RefreshRegistryPolicy\Read-GPRefreshRegistryKey' -Tag 'ReadGPRefreshRegistryKey' {
+            Context 'When the registry key is Present' {
+                Mock -CommandName Get-Item -MockWith {
+                    return @{
+                        Name = 'RefreshRequired'
+                    }
+                }
+                Mock -CommandName Get-ItemProperty -MockWith {
+                    return @{
+                        Value = 1
+                    }
+                }
+
+                It 'Should return the correct values' {
+                    $results = Read-GPRefreshRegistryKey
+
+                    $results.Name | Should -Be 'RefreshRequired'
+                    $results.Value | Should -Be 1
                 }
             }
         }

@@ -14,6 +14,6 @@ ConvertFrom-StringData -StringData @'
     MissingTrailingSemicolonAfterLength = Failed to locate the semicolon after value length. (RPP008)
     MissingClosingBracket = Missing the closing bracket. (RPP009)
     CreateNewPolFile = Creating new pol file at {0}. (RPP010)
-    GPRegistryPolicyExists = Registry policy already exists with Key: {0} ValueName: {1} ValueData: {0}. (RPP011)
+    GPRegistryPolicyExists = Registry policy already exists with Key: {0}, ValueName: {1}, ValueData: {2}. (RPP011)
     NoMatchingPolicies = No matching registry policies found. (RPP012)
 '@

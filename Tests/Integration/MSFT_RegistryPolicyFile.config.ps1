@@ -49,7 +49,7 @@ else
 
 <#
     .SYNOPSIS
-        Disabled SMBv1 by adding the following administrative tempalte key:
+        Disabled SMBv1 by adding the following administrative template key:
         SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
         SMB1 = 1
 #>
@@ -106,7 +106,7 @@ Configuration MSFT_RegistryPolicyFile_Disable_DesktopModification_Config
 <#
     .SYNOPSIS
         Enfores the policy that configures Lanman dependent services.
-        Tests the scenario when the dataType is muti-string.
+        Tests the scenario when the dataType is mutli-string.
 #>
 Configuration MSFT_RegistryPolicyFile_LanmanServices_Config
 {
