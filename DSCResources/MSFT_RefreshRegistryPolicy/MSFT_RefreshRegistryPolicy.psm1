@@ -64,7 +64,7 @@ function Set-TargetResource
 
     Remove-Item -Path HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy -Force
 
-    if ($gpupdateResult -match 'reboot|log\soff')
+    if ($gpupdateResult -match 'restart|log\soff')
     {
         Write-Warning -Message ($script:localizedData.RebootRequired)
         $global:DSCMachineStatus = 1
