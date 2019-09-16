@@ -40,7 +40,6 @@ Configuration RegistryPolicyFile_LanmanDependantServices_Config
 
         RefreshRegistryPolicy RefreashPolicyAfterLanmanDependantServices
         {
-            Name             = 'RefreashPolicyAfterLanmanDependantServices'
             IsSingleInstance = 'Yes'
             DependsOn        = '[RegistryPolicyFile]LanmanDependantServices'
         }

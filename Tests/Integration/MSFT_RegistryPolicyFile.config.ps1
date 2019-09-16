@@ -70,7 +70,6 @@ Configuration MSFT_RegistryPolicyFile_DisableSMB1_Config
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_SMB1'
         {
-            Name = 'RefreshPolicyAfterDisableSMB1'
             IsSingleInstance = 'Yes'
         }
     }
@@ -99,7 +98,6 @@ Configuration MSFT_RegistryPolicyFile_Disable_DesktopModification_Config
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_Disable_DesktopModification'
         {
-            Name = 'RefreshPolicyAfterDisableDesktopModification'
             IsSingleInstance = 'Yes'
         }
     }
@@ -127,7 +125,6 @@ Configuration MSFT_RegistryPolicyFile_LanmanServices_Config
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_LanmanServices'
         {
-            Name             = 'RefreshPolicyAfterLanmanServices'
             IsSingleInstance = 'Yes'
         }
     }
@@ -155,7 +152,6 @@ Configuration MSFT_RegistryPolicyFile_ForcedTunneling_Config
 
         RefreshRegistryPolicy 'Integration_Test_RefreshAfter_ForcedTunneling'
         {
-            Name             = 'RefreshPolicyAfterForcedTunneling'
             IsSingleInstance = 'Yes'
         }
     }

@@ -22,11 +22,7 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
         [String]
-        $IsSingleInstance,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $Name
+        $IsSingleInstance
     )
 
     $refreshKeyValue = Read-GPRefreshRegistryKey
@@ -34,7 +30,6 @@ function Get-TargetResource
     Write-Verbose -Message ($script:localizedData.RefreshRequiredValue -f $refreshKeyValue.Value)
 
     return @{
-        Name               = $Name
         IsSingleInstance = 'Yes'
         Path               = $refreshKeyValue.Path
         RefreshRequiredKey = $refreshKeyValue.Value
@@ -60,11 +55,7 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
         [String]
-        $IsSingleInstance,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $Name
+        $IsSingleInstance
     )
 
     Write-Verbose -Message $script:localizedData.RefreshingGroupPolicy
@@ -96,11 +87,7 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
         [String]
-        $IsSingleInstance,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $Name
+        $IsSingleInstance
     )
 
     $getTargetResourceResult = Get-TargetResource @PSBoundParameters

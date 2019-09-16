@@ -40,7 +40,6 @@ try
                 }
 
                 $defaultParameters = @{
-                    Name = 'Test'
                     IsSingleInstance = 'Yes'
                 }
             }
