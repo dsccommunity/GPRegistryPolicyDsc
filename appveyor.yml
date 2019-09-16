@@ -42,3 +42,35 @@ deploy_script:
         # The DscResource.Template has opt-out from any deploy task to PSGallery.
         # TODO: Opt-in to deploy tasks.
         Invoke-AppVeyorDeployTask -OptIn @()
+        # TODO: Copy the module items to be published to a folder from which it should publish. Change the paths below as needed.
+
+        <# 
+            This should follow guidelines described in the article
+            https://docs.microsoft.com/powershell/gallery/how-to/publishing-packages/publishing-a-package
+        #>
+        if ($env:APPVEYOR_REPO_BRANCH -eq 'master')
+        {
+            $doTestDeploy = $false
+        }
+        else 
+        {
+            $doTestDeploy = $true
+        }
+
+        # This does not work with semantic versions using dash, e.g. '1.0.0-alpha'.
+        Test-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ErrorAction 'Stop' | 
+            Select-Object -Property @('Name', 'Version', 'ModuleType', 'ModuleBase')
+
+        $publishModuleParameters = @{
+            Path        = '.'
+            NuGetApiKey = $env:gallery_api
+            Verbose     = $true
+        }
+
+        if ($doTestDeploy)
+        {
+            $publishModuleParameters['WhatIf'] = $true
+            $publishModuleParameters['NuGetApiKey'] = 'NoApiKey'
+        }
+
+        Publish-Module @publishModuleParameters
