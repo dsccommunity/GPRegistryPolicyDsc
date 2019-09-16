@@ -115,11 +115,11 @@ function Read-GPRefreshRegistryKey
     param
     (
         [Parameter()]
-        [string]
+        [System.String]
         $Path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy',
 
         [Parameter()]
-        [string]
+        [System.String]
         $PropertyName = 'RefreshRequired'
     )
 

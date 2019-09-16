@@ -6,16 +6,16 @@
   GUID = 'fcded2c6-6ba2-4d6c-a35e-55848f90462b'
 
   # Author of this module
-  Author = 'Microsoft Corporation'
+  Author = 'DSC Community'
 
   # Company or vendor of this module
-  CompanyName = 'Microsoft Corporation'
+  CompanyName = 'DSC Community'
 
   # Copyright statement for this module
-  Copyright = '(c) 2019 Microsoft Corporation. All rights reserved.'
+  Copyright = 'Copyright the DSC Community contributors. All rights reserved.'
 
   # Description of the functionality provided by this module
-  Description = 'This resource module contains resources used to apply and manage local group policies by modifying the respective .pol file.'
+  Description = 'This resource module contains DSC resources used to apply and manage local group policies by modifying the respective .pol file.'
 
   # Minimum version of the Windows PowerShell engine required by this module
   PowerShellVersion = '5.0'
@@ -23,6 +23,18 @@
   # Minimum version of the common language runtime (CLR) required by this module
   CLRVersion = '4.0'
 
+  # Functions to export from this module
+  FunctionsToExport = @()
+  
+  # Cmdlets to export from this module
+  CmdletsToExport = @()
+  
+  # Variables to export from this module
+  VariablesToExport = @()
+  
+  # Aliases to export from this module
+  AliasesToExport = @()
+  
   # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
   PrivateData = @{
 

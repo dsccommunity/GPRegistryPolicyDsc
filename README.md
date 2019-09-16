@@ -11,7 +11,7 @@ This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
 ### master
 
-[![Build status](https://ci.appveyor.com/api/projects/status/vqviwd2mmclxeopb/branch/master?svg=true)](https://ci.appveyor.com/project/dsccommunity/GPRegistryPolicyDsc/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/3w6ohuqnmxin63kf/branch/master?svg=true)](https://ci.appveyor.com/project/dsccommunity/GPRegistryPolicyDsc/branch/master)
 [![codecov](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/master)
 
 This is the branch containing the latest release -
@@ -19,7 +19,7 @@ no contributions should be made directly to this branch.
 
 ### dev
 
-[![Build status](https://ci.appveyor.com/api/projects/status/vqviwd2mmclxeopb/branch/dev?svg=true)](https://ci.appveyor.com/project/dsccommunity/GPRegistryPolicyDsc/branch/dev)
+[![Build status](https://ci.appveyor.com/api/projects/status/3w6ohuqnmxin63kf/branch/dev?svg=true)](https://ci.appveyor.com/project/dsccommunity/GPRegistryPolicyDsc/branch/dev)
 [![codecov](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/dev)
 
 This is the development branch to which contributions should be proposed
