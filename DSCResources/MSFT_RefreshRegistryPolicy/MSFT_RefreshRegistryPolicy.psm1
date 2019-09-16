@@ -35,7 +35,7 @@ function Get-TargetResource
 
     return @{
         Name               = $Name
-        $IsSingleInstance = 'Yes'
+        IsSingleInstance = 'Yes'
         Path               = $refreshKeyValue.Path
         RefreshRequiredKey = $refreshKeyValue.Value
     }

@@ -79,9 +79,9 @@ try
                 It 'Should return the correct values to reflect key is absent' {
                     $getTargetResourceResult = Get-TargetResource @getTargetResourceParameters
 
-                    $getTargetResourceResult.Key | Should $registryPolicyParameters.Key
-                    $getTargetResourceResult.ValueName | Should $registryPolicyParameters.ValueName
-                    $getTargetResourceResult.TargetType | Should $registryPolicyParameters.TargetType
+                    $getTargetResourceResult.Key | Should -Be $getTargetResourceParameters.Key
+                    $getTargetResourceResult.ValueName | Should -Be $getTargetResourceParameters.ValueName
+                    $getTargetResourceResult.TargetType | Should -Be $getTargetResourceParameters.TargetType
                     $getTargetResourceResult.Path | Should -Be 'C:\Windows\System32\GroupPolicy\Machine\registry.pol'
                     $getTargetResourceResult.ValueData | Should -BeNullOrEmpty
                     $getTargetResourceResult.ValueType | Should -BeNullOrEmpty
@@ -328,7 +328,7 @@ try
                     Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 1 -Scope 'It'
                     Assert-MockCalled -CommandName Set-GPRegistryPolicyFileEntry -Exactly -Times 1 -Scope 'It'
                     Assert-MockCalled -CommandName Set-RefreshRegistryKey -Exactly -Times 1 -Scope 'It'
-                    Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 0 -Scope 'It'
+                    Assert-MockCalled -CommandName New-GPRegistryPolicyFile -Exactly -Times 1 -Scope 'It'
                 }
             }
 
@@ -404,16 +404,29 @@ try
         }
 
         Describe 'MSFT_RegistryPolicyFile\Set-RefreshRegistryKey' -Tag 'SetRefreshRegistryKey' {
-            BeforeAll {
-                Mock -CommandName New-Item
-                Mock -CommandName New-ItemProperty
-            }
-
             Context 'When setting a registry key to indicate a group policy refresh is needed' {
-                {Set-RefreshRegistryKey | Should -Not -Throw}
+                BeforeAll {
+                    $newItemParameteres = @{
+                        Path         = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy'
+                        PropertyName = 'RefreshRequired'
+                        Value = 1
+                    }
+                    Mock -CommandName New-Item
+                    Mock -CommandName New-ItemProperty
+                }
+                It 'Should set the proper registry key' {
+                    {Set-RefreshRegistryKey @newItemParameteres} | Should -Not -Throw
 
-                Assert-MockCalled -CommandName New-Item -Times 1 -Exactly
-                Assert-MockCalled -CommandName New-ItemProperty -Times 1 - -Exactly
+                    Assert-MockCalled -CommandName New-Item -ParameterFilter {
+                        $Path -eq $newItemParameteres.Path
+                    } -Times 1 -Exactly
+
+                    Assert-MockCalled -CommandName New-ItemProperty -ParameterFilter {
+                        $Path -eq $newItemParameteres.Path -and
+                        $Name -eq $newItemParameteres.PropertyName -and
+                        $Value -eq $newItemParameteres.Value
+                    } -Times 1 -Exactly
+                }
             }
         }
     }

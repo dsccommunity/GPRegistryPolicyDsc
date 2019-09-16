@@ -38,6 +38,11 @@ try
                     Path = 'HKLM:\SOFTWARE\Microsoft\GPRegistryPolicy'
                     Value = 1
                 }
+
+                $defaultParameters = @{
+                    Name = 'Test'
+                    IsSingleInstance = 'Yes'
+                }
             }
 
             Context 'When the system is in the desired state' {
@@ -46,7 +51,7 @@ try
                 }
 
                 It 'Should return the proper registry key property values' {
-                    $getTargetResourceResult = Get-TargetResource -Name 'Test'
+                    $getTargetResourceResult = Get-TargetResource @defaultParameters
                     $getTargetResourceResult.Path | Should -BeNullOrEmpty
                     $getTargetResourceResult.RefreshRequiredKey | Should -BeNullOrEmpty
 
@@ -61,7 +66,7 @@ try
                 }
 
                 It 'Should return a RefreshRequired value of 1' {
-                    $getTargetResourceResult = Get-TargetResource -Name 'Test'
+                    $getTargetResourceResult = Get-TargetResource @defaultParameters
                     $getTargetResourceResult.Path | Should -Be $mockGetItem.Name
                     $getTargetResourceResult.RefreshRequiredKey | Should -Be $mockGetItem.RefreshRequired
 
@@ -84,7 +89,7 @@ try
 
             Context 'When the system is not in the desired state' {
                 It 'Should should call Invoke-Command' {
-                    { Set-TargetResource -Name 'Test' } | Should -Not -Throw
+                    { Set-TargetResource @defaultParameters } | Should -Not -Throw
                     Assert-MockCalled -CommandName Invoke-Command -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Remove-Item -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Write-Warning -Exactly -Times 1 -Scope It
@@ -106,7 +111,7 @@ try
                 }
 
                 It 'Should return $true' {
-                    $testTargetResourceResult = Test-TargetResource -Name 'Test'
+                    $testTargetResourceResult = Test-TargetResource @defaultParameters
                     $testTargetResourceResult | Should -BeTrue
                 }
             }
@@ -119,7 +124,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $testTargetResourceResult = Test-TargetResource -Name 'Test'
+                    $testTargetResourceResult = Test-TargetResource @defaultParameters
                     $testTargetResourceResult | Should -BeFalse
                 }
             }
@@ -134,13 +139,13 @@ try
                 }
                 Mock -CommandName Get-ItemProperty -MockWith {
                     return @{
-                        Value = 1
+                        RefreshRequired = 1
                     }
                 }
 
                 It 'Should return the correct values' {
                     $results = Read-GPRefreshRegistryKey
-                    $results.Name | Should -Be 'RefreshRequired'
+                    $results.Path | Should -Be 'RefreshRequired'
                     $results.Value | Should -Be 1
                 }
             }
