@@ -9,4 +9,5 @@ ConvertFrom-StringData -StringData @'
     TranslatingNameToSid = Translating {0} to SID. (RPF003)
     RetrievingCurrentState = Retrieving current for Key {0} ValueName {1}. (RPF04)
     InDesiredState = Resource is in desired state. No refresh required. (RPF05)
+    AccountNameNull = No AccountName was provided. (RPF06)
 '@

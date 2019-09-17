@@ -60,7 +60,8 @@ deploy_script:
         Test-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ErrorAction 'Stop' |
             Select-Object -Property @('Name', 'Version', 'ModuleType', 'ModuleBase')
 
-        Get-ChildItem -Path . -Exclude 'DSCResources','Modules','GPRegistryPolicyDsc.psd1' | Remove-Item -Force -Recurse
+        Get-ChildItem -Path . -Exclude 'DSCResources','Modules','GPRegistryPolicyDsc.psd1'
+            | Remove-Item -Force -Recurse
 
         $publishModuleParameters = @{
             Path        = '.'

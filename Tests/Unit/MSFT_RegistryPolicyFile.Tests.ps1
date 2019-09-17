@@ -382,6 +382,12 @@ try
                     $result | Should -Be $desiredResult
                 }
             }
+
+            Context 'TargetType is Account and AccountName is null' {
+                It 'Should throw' {
+                    {Get-RegistryPolicyFilePath -TargetType 'Account' -AccountName $null} | Should -Throw
+                }
+            }
         }
 
         Describe 'MSFT_RegistryPolicyFile\ConvertTo-SecurityIdentifer' -Tag 'Helper' {
