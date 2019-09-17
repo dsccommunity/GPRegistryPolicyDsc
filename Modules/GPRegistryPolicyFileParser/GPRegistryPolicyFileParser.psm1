@@ -246,13 +246,13 @@ function New-GPRegistryPolicyFile
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $Path
     )
 
-    $script:REGFILE_SIGNATURE = 0x67655250 # PRef
-    $script:REGISTRY_FILE_VERSION = 0x00000001 #Initially defined as 1, then incremented each time the file format is changed.
+    $policyFileSignature = 0x67655250 # PRef
+    $policyFileVersion = 0x00000001 #Initially defined as 1, then incremented each time the file format is changed.
     $null = Remove-Item -Path $Path -Force -ErrorAction SilentlyContinue
 
     Write-Verbose -Message ($script:localizedData.CreateNewPolFile -f $polFilePath)
@@ -260,8 +260,8 @@ function New-GPRegistryPolicyFile
     $null = New-Item -Path $Path -Force -ErrorAction Stop
 
     $encodingParameter = Get-ByteStreamParameter
-    [System.BitConverter]::GetBytes($script:REGFILE_SIGNATURE) | Add-Content -Path $Path @encodingParameter
-    [System.BitConverter]::GetBytes($script:REGISTRY_FILE_VERSION) | Add-Content -Path $Path @encodingParameter
+    [System.BitConverter]::GetBytes($policyFileSignature) | Add-Content -Path $Path @encodingParameter
+    [System.BitConverter]::GetBytes($policyFileVersion) | Add-Content -Path $Path @encodingParameter
 }
 
 <#

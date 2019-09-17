@@ -90,7 +90,7 @@ function Get-TargetResource
     $getTargetResourceResult = @{
         Key         = $Key
         ValueName   = $ValueName
-        ValueData   = [string[]] $currentResults.ValueData
+        ValueData   = [System.String[]] $currentResults.ValueData
         ValueType   = $valueTypeResult
         TargetType  = $TargetType
         Ensure      = $ensureResult
@@ -229,8 +229,6 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '',
-        Justification = 'Useful verbose information is provided by the Test-DscParameterState helper function.')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
@@ -325,8 +323,6 @@ function Get-RegistryPolicyFilePath
         $TargetType,
 
         [Parameter()]
-        [AllowNull()]
-        [AllowEmptyString()]
         [System.String]
         $AccountName
     )

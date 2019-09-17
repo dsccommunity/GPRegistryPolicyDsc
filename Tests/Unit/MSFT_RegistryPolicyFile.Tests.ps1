@@ -161,7 +161,6 @@ try
                     Path        = '"C:\Windows\System32\GroupPolicy\Machine\registry.pol"'
                     AccountName = 'Machine'
                 }
-
             }
 
             BeforeEach {

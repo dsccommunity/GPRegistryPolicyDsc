@@ -157,13 +157,13 @@ InModuleScope 'GPRegistryPolicyFileParser' {
             New-GPRegistryPolicyFile -Path $polFilePath
         }
 
-        Context 'When ValueType is mutliString' {
+        Context 'When ValueType is multiString' {
             BeforeEach {
                 $registryPolicyEntry = New-GPRegistryPolicy @registryEntryParameters
                 Set-GPRegistryPolicyFileEntry -Path $polFilePath -RegistryPolicy $registryPolicyEntry
             }
 
-            It 'Should return the correct mutliString results' {
+            It 'Should return the correct multiString results' {
                 $results = Read-GPRegistryPolicyFile -Path $polFilePath
 
                 $results.Key       | Should -Be $registryPolicyEntry.Key

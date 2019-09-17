@@ -57,9 +57,10 @@ deploy_script:
             $doTestDeploy = $true
         }
 
-        # This does not work with semantic versions using dash, e.g. '1.0.0-alpha'.
-        Test-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ErrorAction 'Stop' | 
+        Test-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ErrorAction 'Stop' |
             Select-Object -Property @('Name', 'Version', 'ModuleType', 'ModuleBase')
+
+        Get-ChildItem -Path . -Exclude 'DSCResources','Modules','GPRegistryPolicyDsc.psd1' | Remove-Item -Force -Recurse
 
         $publishModuleParameters = @{
             Path        = '.'
