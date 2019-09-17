@@ -347,10 +347,11 @@ function Get-RegistryPolicyFilePath
         }
         'Account'
         {
-            if ($null -eq $AccountName)
+            if ([System.String]::IsNullOrEmpty($AccountName))
             {
                 throw $script:localizedData.AccountNameNull
             }
+
             $sid = ConvertTo-SecurityIdentifier -AccountName $AccountName
             $childPath = "System32\GroupPolicyUsers\$sid\User\registry.pol"
         }
