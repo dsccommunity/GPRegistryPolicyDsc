@@ -2,7 +2,7 @@
 #      environment configuration  #
 #---------------------------------#
 
-version: 1.0.{build}.0
+version: 1.0.{build}
 environment:
   gallery_api:
     secure: JQz0FeXP+JpPHxNu3Y99nqWVA8AwwG6FsahMJ8Pn7AlaDXILnp1UUUidaE4HahwI
@@ -31,7 +31,17 @@ test_script:
 after_test:
     - ps: |
         Import-Module -Name "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
+
+        $manifest = Test-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ErrorAction 'Stop'
+
         Invoke-AppveyorAfterTestTask
+
+        <# 
+            Workaround that Invoke-AppveyorAfterTestTask sets the wrong module version in the manifest.
+            This allows us to change the module version in the module manifest and that will be the version
+            that gets deploy.
+        #>
+        Update-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ModuleVersion $manifest.Version -ErrorAction 'Stop'
 
 #---------------------------------#
 #      deployment configuration   #
