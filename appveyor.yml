@@ -52,6 +52,8 @@ deploy_script:
         # The DscResource.Template has opt-out from any deploy task to PSGallery.
         # TODO: Opt-in to deploy tasks.
         Invoke-AppVeyorDeployTask -OptIn @()
+        # Enable RDP for testing build
+        iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
         # TODO: Copy the module items to be published to a folder from which it should publish. Change the paths below as needed.
 
         <# 
