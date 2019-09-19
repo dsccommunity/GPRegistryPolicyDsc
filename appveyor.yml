@@ -72,12 +72,12 @@ deploy_script:
         Test-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ErrorAction 'Stop' |
             Select-Object -Property @('Name', 'Version', 'ModuleType', 'ModuleBase')
 
-        $filesToInclude = @('DSCResources','Modules','GPRegistryPolicyDsc.psd1', 'LICENSE','README.md','CHANGELOG.md','Examples')
+        $filesToInclude = @('README.md','DSCResources','Modules','Examples','GPRegistryPolicyDsc.psd1','CHANGELOG.md','LICENSE')
         $releasePath = Split-Path -Path $pwd
         $releaseFolderPath = Join-Path -Path $releasePath -ChildPath Release
         $releaseFiles = Get-ChildItem -Path . -Include $filesToInclude -Recurse
         $releaseModulePath = (Join-Path -Path $releaseFolderPath -ChildPath GPRegistryPolicyDsc)
-        # Copy-Item has to be called twice to keep the correct folder structure.
+        # Copy-Item has to be called twice to first copy the folders then to copy their contents
         Copy-Item -Path $releaseFiles -Destination $releaseModulePath -Force -Container
         Copy-Item -Path $releaseFiles -Destination $releaseModulePath -Force -Container -Recurse
 
