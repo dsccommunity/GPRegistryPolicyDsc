@@ -49,10 +49,8 @@ after_test:
 
 deploy_script:
   - ps: |
-        # The DscResource.Template has opt-out from any deploy task to PSGallery.
-        # TODO: Opt-in to deploy tasks.
-        Invoke-AppVeyorDeployTask -OptIn @()
-        # TODO: Copy the module items to be published to a folder from which it should publish. Change the paths below as needed.
+        Invoke-AppVeyorDeployTask -OptIn @('PublishExample')
+
         <# 
             This should follow guidelines described in the article
             https://docs.microsoft.com/powershell/gallery/how-to/publishing-packages/publishing-a-package
