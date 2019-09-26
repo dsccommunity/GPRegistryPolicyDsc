@@ -1,6 +1,6 @@
 @{
   # Version number of this module.
-  moduleVersion = '1.0.0'
+  moduleVersion = '1.0.1'
 
   # ID used to uniquely identify this module
   GUID = 'fcded2c6-6ba2-4d6c-a35e-55848f90462b'
@@ -25,13 +25,13 @@
 
   # Functions to export from this module
   FunctionsToExport = @()
-  
+
   # Cmdlets to export from this module
   CmdletsToExport = @()
-  
+
   # Variables to export from this module
   VariablesToExport = @()
-  
+
   # Aliases to export from this module
   AliasesToExport = @()
 
@@ -40,7 +40,7 @@
       'RefreshRegistryPolicy'
       'RegistryPolicyFile'
   )
-  
+
   # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
   PrivateData = @{
 
@@ -57,7 +57,7 @@
 
           # ReleaseNotes of this module
           ReleaseNotes = '* Fixed [#3](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/3)
-            * Updated release logic to not include .git folder.'
+          * Updated release logic to not include .git folder.'
 
       } # End of PSData hash table
 
