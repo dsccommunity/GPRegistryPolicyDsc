@@ -41,7 +41,11 @@ after_test:
             This allows us to change the module version in the module manifest and that will be the version
             that gets deploy.
         #>
-        Update-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ModuleVersion $manifest.Version -ErrorAction 'Stop'
+
+        if ($env:APPVEYOR_REPO_BRANCH -eq 'master')
+        {
+            Update-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ModuleVersion $manifest.Version -ErrorAction 'Stop'
+        }
 
 #---------------------------------#
 #      deployment configuration   #
