@@ -34,6 +34,12 @@
   
   # Aliases to export from this module
   AliasesToExport = @()
+
+  # DSC resources to export from this module
+  DscResourcesToExport = @(
+      'RefreshRegistryPolicy'
+      'RegistryPolicyFile'
+  )
   
   # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
   PrivateData = @{
@@ -50,7 +56,8 @@
           ProjectUri = 'https://github.com/dsccommunity/GPRegistryPolicyDsc'
 
           # ReleaseNotes of this module
-          ReleaseNotes = 'Intial release.'
+          ReleaseNotes = '* Fixed [#3](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/3)
+            * Updated release logic to not include .git folder.'
 
       } # End of PSData hash table
 
