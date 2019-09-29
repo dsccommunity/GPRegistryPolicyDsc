@@ -41,7 +41,11 @@ after_test:
             This allows us to change the module version in the module manifest and that will be the version
             that gets deploy.
         #>
-        Update-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ModuleVersion $manifest.Version -ErrorAction 'Stop'
+
+        if ($env:APPVEYOR_REPO_BRANCH -eq 'master')
+        {
+            Update-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ModuleVersion $manifest.Version -ErrorAction 'Stop'
+        }
 
 #---------------------------------#
 #      deployment configuration   #
@@ -49,10 +53,7 @@ after_test:
 
 deploy_script:
   - ps: |
-        # The DscResource.Template has opt-out from any deploy task to PSGallery.
-        # TODO: Opt-in to deploy tasks.
-        Invoke-AppVeyorDeployTask -OptIn @()
-        # TODO: Copy the module items to be published to a folder from which it should publish. Change the paths below as needed.
+        Invoke-AppVeyorDeployTask -OptIn @('PublishExample')
 
         <# 
             This should follow guidelines described in the article
@@ -70,12 +71,17 @@ deploy_script:
         Test-ModuleManifest -Path .\GPRegistryPolicyDsc.psd1 -ErrorAction 'Stop' |
             Select-Object -Property @('Name', 'Version', 'ModuleType', 'ModuleBase')
 
-        $filesToExclude = @('DSCResources','Modules','GPRegistryPolicyDsc.psd1', 'LICENSE','README.md','CHANGELOG.md','Examples')
-        Get-ChildItem -Path . -Exclude $filesToExclude |
-            Remove-Item -Force -Recurse
+        $filesToInclude = @('README.md','DSCResources','Modules','Examples','GPRegistryPolicyDsc.psd1','CHANGELOG.md','LICENSE')
+        $releasePath = Split-Path -Path $pwd
+        $releaseFolderPath = (New-Item -Path $releasePath -Name Release -ItemType Directory).FullName
+        $releaseModulePath = (New-Item -Path $releaseFolderPath -Name GPRegistryPolicyDsc -ItemType Directory).FullName
+        $releaseFiles = Get-ChildItem -Path . -Include $filesToInclude -Recurse
+        # Copy-Item has to be called twice to first copy the folders then to copy their contents
+        Copy-Item -Path $releaseFiles -Destination $releaseModulePath -Force -Container
+        Copy-Item -Path $releaseFiles -Destination $releaseModulePath -Force -Container -Recurse
 
         $publishModuleParameters = @{
-            Path        = '.'
+            Path        = $releaseModulePath
             NuGetApiKey = $env:gallery_api
             Verbose     = $true
         }
