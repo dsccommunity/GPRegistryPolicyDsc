@@ -1,12 +1,20 @@
 # Change log for GPRegistryPolicyDsc
 
-## Unreleased
+The format is based on and uses the types of changes according to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.0.1
+## [Unreleased]
 
-* Fixed [#3](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/3)
-* Updated release logic to not include .git folder.
+### Added
 
-## 1.0.0
+- GPRegistryPolicyDsc
+  - Added continuous delivery with a new CI pipeline.
 
-* Initial release.
+## [1.0.1] - 2019-09-29
+
+- Fixed [#3](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/3)
+- Updated release logic to not include .git folder.
+
+## [1.0.0] - 2019-09-18
+
+- Initial release.

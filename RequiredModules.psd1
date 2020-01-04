@@ -1,5 +1,4 @@
 @{
-    # Set up a mini virtual environment...
     PSDependOptions      = @{
         AddToPath  = $True
         Target     = 'output\RequiredModules'
@@ -18,11 +17,4 @@
     'DscResource.Test'          = 'latest'
     'DscResource.AnalyzerRules' = 'latest'
     xDscResourceDesigner        = 'latest'
-
-
-    # PSPKI                       = 'latest'
-    # 'DscResource.Common' = @{
-    #     Target     = 'Source/Modules'
-    #     Version    = 'latest'
-    # }
 }
