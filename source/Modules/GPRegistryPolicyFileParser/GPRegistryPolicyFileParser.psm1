@@ -568,7 +568,7 @@ function Format-MultiStringValue
     }
 }
 
-Enum RegType
+enum RegType
 {
     REG_NONE = 0 # No value type
     REG_SZ = 1 # Unicode null terminated string
@@ -590,7 +590,7 @@ Enum RegType
     .SYNOPSIS
         Class to create and manage registry policy objects
 #>
-Class GPRegistryPolicy
+class GPRegistryPolicy
 {
     [System.String]  $Key
     [System.String]  $ValueName
