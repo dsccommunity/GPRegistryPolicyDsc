@@ -2,30 +2,31 @@
 $script:dscModuleName = 'GPRegistryPolicyDsc'
 $script:dscResourceName = 'MSFT_RegistryPolicyFile'
 
-# Unit Test Template Version: 1.2.4
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 }
-
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
-
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -ResourceType 'Mof' `
-    -TestType Unit
-
-#endregion HEADER
 
 function Invoke-TestCleanup
 {
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-# Begin Testing
+Invoke-TestSetup
+
 try
 {
     InModuleScope $script:dscResourceName {
@@ -98,7 +99,7 @@ try
                         AccountName = 'User1'
                     }
                 }
-    
+
                 BeforeEach {
                     Mock -CommandName Get-RegistryPolicyFilePath -MockWith {
                         $polPath
@@ -165,7 +166,7 @@ try
 
             BeforeEach {
                 $testTargetResourceParameters = $defaultParameters.Clone()
-                
+
             }
 
             Context 'When the system is in the desired state' {
@@ -179,7 +180,7 @@ try
                     BeforeEach {
                         $testTargetResourceParameters['Ensure'] = 'Absent'
                         $getTargetResourceResults = $getTargetResourceDefaultReadResults + $testTargetResourceParameters
-                        
+
                     }
 
                     It 'Should return the $true' {
@@ -276,7 +277,7 @@ try
 
             BeforeEach {
                 $setTargetResourceParameters = $defaultParameters.Clone()
-            } 
+            }
 
             Context 'When the configuration should be absent' {
                 BeforeAll {
@@ -355,7 +356,7 @@ try
         Describe 'MSFT_RegistryPolicyFile\Get-RegistryPolicyFilePath' -Tag 'Helper' {
             BeforeAll {
                 Mock -CommandName ConvertTo-SecurityIdentifier -ParameterFilter {$AccountName -ne 'administrators'}
-                
+
                 $filePathMap  = @{
                     ComputerConfiguration = 'System32\GroupPolicy\Machine\registry.pol'
                     UserConfiguration     = 'System32\GroupPolicy\User\registry.pol'
@@ -378,7 +379,7 @@ try
                     param ($TargetType, $AccountName)
                     $result = Get-RegistryPolicyFilePath -TargetType $TargetType -AccountName $AccountName
                     $desiredResult = Join-Path -Path $env:SystemRoot -ChildPath $filePathMap[$TargetType]
-                    
+
                     $result | Should -Be $desiredResult
                 }
             }

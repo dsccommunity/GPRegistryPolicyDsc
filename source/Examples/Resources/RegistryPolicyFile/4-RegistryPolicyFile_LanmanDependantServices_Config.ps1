@@ -1,25 +1,42 @@
 <#PSScriptInfo
-.VERSION 1.0.0
-.GUID 53371052-3c19-4cc0-a2fb-7ccf94c24d50
-.AUTHOR Microsoft Corporation
-.COMPANYNAME Microsoft Corporation
-.COPYRIGHT
-.TAGS DSCConfiguration
-.LICENSEURI https://github.com/dsccommunity/GPRegistryPolicyDsc/blob/master/LICENSE
-.PROJECTURI https://github.com/dsccommunity/GPRegistryPolicyDsc
-.ICONURI
-.EXTERNALMODULEDEPENDENCIES
-.REQUIREDSCRIPTS
-.EXTERNALSCRIPTDEPENDENCIES
-.RELEASENOTES First version.
-.PRIVATEDATA 2016-Datacenter,2016-Datacenter-Server-Core
-#>
 
-#Requires -module GPRegistryPolicyDsc
+.VERSION 1.0.1
+
+.GUID 53371052-3c19-4cc0-a2fb-7ccf94c24d50
+
+.AUTHOR DSC Community
+
+.COMPANYNAME DSC Community
+
+.COPYRIGHT DSC Community contributors. All rights reserved.
+
+.TAGS DSCConfiguration
+
+.LICENSEURI https://github.com/dsccommunity/GPRegistryPolicyDsc/blob/master/LICENSE
+
+.PROJECTURI https://github.com/dsccommunity/GPRegistryPolicyDsc
+
+.ICONURI https://dsccommunity.org/images/DSC_Logo_300p.png
+
+.EXTERNALMODULEDEPENDENCIES 
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.RELEASENOTES
+Updated author, copyright notice, and URLs.
+
+.PRIVATEDATA 2016-Datacenter,2016-Datacenter-Server-Core
+
+#> 
+
+#Requires -Module GPRegistryPolicyDsc
+
 
 <#
     .DESCRIPTION
-        Configuration that will configure the lanmanWorkstation DependOnService property.
+        Configuration that will configure the LanmanWorkstation DependOnService property.
         This example demonstrates passing an array (MultiString) to ValueData.
 #>
 Configuration RegistryPolicyFile_LanmanDependantServices_Config
@@ -28,7 +45,7 @@ Configuration RegistryPolicyFile_LanmanDependantServices_Config
 
     node localhost
     {
-        RegistryPolicyFile LanmanDependantServices
+        RegistryPolicyFile 'LanmanDependantServices'
         {
             Key         = 'SYSTEM\CurrentControlSet\Services\LanmanWorkstation'
             TargetType  = 'ComputerConfiguration'
@@ -38,7 +55,7 @@ Configuration RegistryPolicyFile_LanmanDependantServices_Config
             Ensure      = 'Present'
         }
 
-        RefreshRegistryPolicy RefreashPolicyAfterLanmanDependantServices
+        RefreshRegistryPolicy 'RefreshPolicyAfterLanmanDependantServices'
         {
             IsSingleInstance = 'Yes'
             DependsOn        = '[RegistryPolicyFile]LanmanDependantServices'
