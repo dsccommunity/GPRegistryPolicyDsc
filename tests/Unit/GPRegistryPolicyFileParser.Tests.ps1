@@ -1,12 +1,21 @@
+#region HEADER
+$script:projectPath = "$PSScriptRoot\..\.." | Convert-Path
+$script:projectName = (Get-ChildItem -Path "$script:projectPath\*\*.psd1" | Where-Object -FilterScript {
+        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
+        $(try { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop } catch { $false })
+    }).BaseName
 
-# Import the GPRegistryPolicyFileParser module to test
-$script:resourceModulePath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
-$script:modulesFolderPath = Join-Path -Path $script:resourceModulePath -ChildPath 'Modules\GPRegistryPolicyFileParser'
+$script:parentModule = Get-Module -Name $script:projectName -ListAvailable | Select-Object -First 1
+$script:subModulesFolder = Join-Path -Path $script:parentModule.ModuleBase -ChildPath 'Modules'
+Remove-Module -Name $script:parentModule -Force -ErrorAction 'SilentlyContinue'
 
-Import-Module -Name (Join-Path -Path $script:modulesFolderPath -ChildPath 'GPRegistryPolicyFileParser.psm1') -Force
+$script:subModuleName = (Split-Path -Path $PSCommandPath -Leaf) -replace '\.Tests.ps1'
+$script:subModuleFile = Join-Path -Path $script:subModulesFolder -ChildPath "$($script:subModuleName)"
 
+Import-Module $script:subModuleFile -Force -ErrorAction 'Stop'
+#endregion HEADER
 
-InModuleScope 'GPRegistryPolicyFileParser' {
+InModuleScope $script:subModuleName {
     Describe 'Format-MultiStringValue' -Tag 'FormatMultiStringValue' {
         BeforeAll {
             $predictedResult = @(
@@ -22,7 +31,7 @@ InModuleScope 'GPRegistryPolicyFileParser' {
             }
 
             It 'Should return the proper registry key property values' {
-                
+
                 $result = Format-MultiStringValue -MultiStringValue $stringInput
                 $result | Should -Be $predictedResult
             }
@@ -287,7 +296,7 @@ InModuleScope 'GPRegistryPolicyFileParser' {
             }
 
             It 'Should return type of GPRegistryPolicy' {
-                $registryPolicyEntry -is [GPRegistryPolicy] | Should -BeTrue                
+                $registryPolicyEntry -is [GPRegistryPolicy] | Should -BeTrue
                 $registryPolicyEntry.Key | Should -Be $registryEntryParameters.Key
                 $registryPolicyEntry.ValueName | Should -Be $registryEntryParameters.ValueName
                 $registryPolicyEntry.ValueData | Should -Be $registryEntryParameters.ValueData

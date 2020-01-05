@@ -1,35 +1,30 @@
 # GPRegistryPolicyDsc
 
+[![Build Status](https://dev.azure.com/dsccommunity/GPRegistryPolicyDsc/_apis/build/status/dsccommunity.GPRegistryPolicyDsc?branchName=master)](https://dev.azure.com/dsccommunity/GPRegistryPolicyDsc/_build/latest?definitionId=12&branchName=master)
+![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/GPRegistryPolicyDsc/12/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/GPRegistryPolicyDsc/12/master)](https://dsccommunity.visualstudio.com/GPRegistryPolicyDsc/_test/analytics?definitionId=12&contextType=build)
+[![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/GPRegistryPolicyDsc?label=GPRegistryPolicyDsc%20Preview)](https://www.powershellgallery.com/packages/GPRegistryPolicyDsc/)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/GPRegistryPolicyDsc?label=GPRegistryPolicyDsc)](https://www.powershellgallery.com/packages/GPRegistryPolicyDsc/)
+
 This resource module contains resources used to apply and manage local group policies
 by modifying the respective .pol file.
 
 This module is an adaptation from [GPRegistryPolicy](https://github.com/PowerShell/GPRegistryPolicy).
 
-This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
+## Code of Conduct
 
-## Branches
+This project has adopted this [Code of Conduct](CODE_OF_CONDUCT.md).
 
-### master
+## Releases
 
-[![Build status](https://ci.appveyor.com/api/projects/status/3w6ohuqnmxin63kf/branch/master?svg=true)](https://ci.appveyor.com/project/dsccommunity/GPRegistryPolicyDsc/branch/master)
-[![codecov](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/master)
-
-This is the branch containing the latest release -
-no contributions should be made directly to this branch.
-
-### dev
-
-[![Build status](https://ci.appveyor.com/api/projects/status/3w6ohuqnmxin63kf/branch/dev?svg=true)](https://ci.appveyor.com/project/dsccommunity/GPRegistryPolicyDsc/branch/dev)
-[![codecov](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/dev)
-
-This is the development branch to which contributions should be proposed
-by contributors as pull requests.
-This development branch will periodically be merged to the master branch,
-and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
+For each merge to the branch `master` a preview release will be
+deployed to [PowerShell Gallery](https://www.powershellgallery.com/).
+Periodically a release version tag will be pushed which will deploy a
+full release to [PowerShell Gallery](https://www.powershellgallery.com/).
 
 ## Contributing
 
-Please see our [contributing guidelines](/CONTRIBUTING.md).
+Please check out common DSC Community [contributing guidelines](https://dsccommunity.org/guidelines/contributing).
 
 ## Installation
 
@@ -62,7 +57,7 @@ or higher.
 
 ## Examples
 
-You can review the [Examples](/Examples) directory for some general use
+You can review the [Examples](/source/Examples) directory for some general use
 scenarios for all of the resources that are in the module.
 
 ## Change log
@@ -132,10 +127,10 @@ A resource to manage registry policy entries in a policy (.pol) file.
 
 #### Examples
 
-* [Disable SMB1](/Examples/Resources/RegistryPolicyFile/1-RegistryPolicyFile_DisableSmb1_Config.ps1)
-* [Disable SMB1 not configured](/Examples/Resources/RegistryPolicyFile/2-RegistryPolicy_SMB1NotConfigured_Config.ps1)
-* [Disable desktop changes, Target type is Account](/Examples/Resources/RegistryPolicyFile/3-RegistryPolicyFile_DisableDesktopChanges_Config.ps1)
-* [Configure lanman dependant services, MutiString datatype example](/Examples/Resources/RegistryPolicyFile/4-RegistryPolicyFile_LanmanDependantServices_Config.ps1)
+* [Disable SMB1](/source/Examples/Resources/RegistryPolicyFile/1-RegistryPolicyFile_DisableSmb1_Config.ps1)
+* [Disable SMB1 not configured](/source/Examples/Resources/RegistryPolicyFile/2-RegistryPolicy_SMB1NotConfigured_Config.ps1)
+* [Disable desktop changes, Target type is Account](/source/Examples/Resources/RegistryPolicyFile/3-RegistryPolicyFile_DisableDesktopChanges_Config.ps1)
+* [Configure lanman dependant services, MutiString datatype example](/source/Examples/Resources/RegistryPolicyFile/4-RegistryPolicyFile_LanmanDependantServices_Config.ps1)
 
 #### Known issues
 

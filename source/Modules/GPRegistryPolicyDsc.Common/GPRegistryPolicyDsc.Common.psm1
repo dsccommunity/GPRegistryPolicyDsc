@@ -481,13 +481,3 @@ function New-NotImplementedException
 }
 
 $script:localizedData = Get-LocalizedData -ResourceName 'GPRegistryPolicyDsc.Common' -ScriptRoot $PSScriptRoot
-
-Export-ModuleMember -Function @(
-    'Test-DscParameterState',
-    'New-InvalidArgumentException',
-    'New-InvalidOperationException',
-    'New-ObjectNotFoundException',
-    'New-InvalidResultException',
-    'New-NotImplementedException',
-    'Get-LocalizedData'
-)

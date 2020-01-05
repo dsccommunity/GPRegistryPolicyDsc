@@ -1,21 +1,38 @@
 <#PSScriptInfo
-.VERSION 1.0.0
-.GUID 041272b8-6ac6-4a23-90f9-428d2823502d
-.AUTHOR Microsoft Corporation
-.COMPANYNAME Microsoft Corporation
-.COPYRIGHT
-.TAGS DSCConfiguration
-.LICENSEURI https://github.com/dsccommunity/GPRegistryPolicyDsc/blob/master/LICENSE
-.PROJECTURI https://github.com/dsccommunity/GPRegistryPolicyDsc
-.ICONURI
-.EXTERNALMODULEDEPENDENCIES
-.REQUIREDSCRIPTS
-.EXTERNALSCRIPTDEPENDENCIES
-.RELEASENOTES First version.
-.PRIVATEDATA 2016-Datacenter,2016-Datacenter-Server-Core
-#>
 
-#Requires -module GPRegistryPolicyDsc
+.VERSION 1.0.1
+
+.GUID 041272b8-6ac6-4a23-90f9-428d2823502d
+
+.AUTHOR DSC Community
+
+.COMPANYNAME DSC Community
+
+.COPYRIGHT DSC Community contributors. All rights reserved.
+
+.TAGS DSCConfiguration
+
+.LICENSEURI https://github.com/dsccommunity/GPRegistryPolicyDsc/blob/master/LICENSE
+
+.PROJECTURI https://github.com/dsccommunity/GPRegistryPolicyDsc
+
+.ICONURI https://dsccommunity.org/images/DSC_Logo_300p.png
+
+.EXTERNALMODULEDEPENDENCIES 
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.RELEASENOTES
+Updated author, copyright notice, and URLs.
+
+.PRIVATEDATA 2016-Datacenter,2016-Datacenter-Server-Core
+
+#> 
+
+#Requires -Module GPRegistryPolicyDsc
+
 
 <#
     .DESCRIPTION
@@ -28,7 +45,7 @@ Configuration RegistryPolicyFile_DisableDesktopChanges_Config
 
     node localhost
     {
-        RegistryPolicyFile DisableDesktopChanges
+        RegistryPolicyFile 'DisableDesktopChanges'
         {
             Key         = 'Software\Microsoft\Windows\CurrentVersion\Policies\Explorer'
             TargetType  = 'Account'
@@ -39,7 +56,7 @@ Configuration RegistryPolicyFile_DisableDesktopChanges_Config
             Ensure      = 'Present'
         }
 
-        RefreshRegistryPolicy RefreashPolicyAfterDisableDesktopChanges
+        RefreshRegistryPolicy 'RefreshPolicyAfterDisableDesktopChanges'
         {
             IsSingleInstance = 'Yes'
             DependsOn        = '[RegistryPolicyFile]DisableDesktopChanges'
