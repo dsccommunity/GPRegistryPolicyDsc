@@ -5,6 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- GPRegistryPolicyDsc
+  - Update GitVersion.yml with the correct regular expression.
+
+### Changed
+
+- GPRegistryPolicyDsc
+  - Set a display name on all the jobs and tasks in the CI pipeline.
+
 ## [1.1.0] - 2020-01-05
 
 ### Added
