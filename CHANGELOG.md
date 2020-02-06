@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - GPRegistryPolicyDsc
-  - Add support to upload coverage to Codecov.io.
-  
+  - Add support to upload coverage to Codecov.io ([issue #16](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/16)).
+
 ### Fixed
 
 - GPRegistryPolicyDsc
@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - GPRegistryPolicyDsc
   - Set a display name on all the jobs and tasks in the CI pipeline.
+  - Change the Azure Pipelines Microsoft Host Agents to use the image 
+    `windows-2019` ([issue #15](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/15)).
 
 ## [1.1.0] - 2020-01-05
 
