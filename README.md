@@ -2,6 +2,7 @@
 
 [![Build Status](https://dev.azure.com/dsccommunity/GPRegistryPolicyDsc/_apis/build/status/dsccommunity.GPRegistryPolicyDsc?branchName=master)](https://dev.azure.com/dsccommunity/GPRegistryPolicyDsc/_build/latest?definitionId=12&branchName=master)
 ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/GPRegistryPolicyDsc/12/master)
+[![codecov](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/dsccommunity/GPRegistryPolicyDsc)
 [![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/GPRegistryPolicyDsc/12/master)](https://dsccommunity.visualstudio.com/GPRegistryPolicyDsc/_test/analytics?definitionId=12&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/GPRegistryPolicyDsc?label=GPRegistryPolicyDsc%20Preview)](https://www.powershellgallery.com/packages/GPRegistryPolicyDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/GPRegistryPolicyDsc?label=GPRegistryPolicyDsc)](https://www.powershellgallery.com/packages/GPRegistryPolicyDsc/)
