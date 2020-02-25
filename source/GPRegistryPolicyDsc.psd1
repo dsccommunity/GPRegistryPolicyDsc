@@ -23,6 +23,11 @@
   # Minimum version of the common language runtime (CLR) required by this module
   CLRVersion = '4.0'
 
+  # Scripts to execute prior to module import
+  ScriptsToProcess = @(
+      '.\Modules\GPRegistryPolicyDsc.Common\GPRegistryPolicyDsc.Helper.psd1'
+  )
+
   # Functions to export from this module
   FunctionsToExport = @()
 
@@ -46,7 +51,7 @@
 
       PSData = @{
           Prerelease = ''
-          
+
           # Tags applied to this module. These help with module discovery in online galleries.
           Tags = @('DesiredStateConfiguration', 'DSC', 'DSCResourceKit', 'DSCResource')
 
