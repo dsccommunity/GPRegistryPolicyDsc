@@ -496,73 +496,17 @@ function Set-GptIniFile
         }
 
         <#
-            To ensure consistent gpt.ini file structure, querying Version and setting Version so the structure will always be:
-            gPCMachineExtensionName = [{guids}]
+            To ensure consistent gpt.ini file structure, querying Version and setting Version so the structure will be:
+            gPC[User|Machine]ExtensionName = [{guids}]
             Version = 11111
-            gPCUserExtensionNames = [{guids}]
+            gPC[User|Machine]ExtensionName = [{guids}]
         #>
         $gptVersion = Get-PrivateProfileString -AppName 'General' -KeyName 'Version' -Default 0 -GptIniPath $gptIniPath
         Write-PrivateProfileString -AppName 'General' -KeyName 'Version' -KeyValue $gptVersion -GptIniPath $gptIniPath
     }
 
-    <#
-        Ref: https://docs.microsoft.com/en-us/archive/blogs/grouppolicy/understanding-the-gpo-version-number
-        The version integer value in the GPT.ini has the following structure:
-            Version = [user version number top 16 bits] [computer version number lower 16 bits]
-        Below is a simple way to split the version number into the user and computer version number:
-            * First, recognize that the version number is in decimal. Before we can split the number into the two version numbers,
-              we first convert the decimal value to hex. The easiest way to perform this conversion is to use the calculator in windows
-              in scientific mode. Enter the decimal value and then click the hex button to convert the number. You should see a value of 15002F.
-            * If you are using the calculator, it will not display the leading zeros of the number. In hexadecimal, four hexadecimal characters
-              are equal to 16 bits. When you split the number into two parts you'll need to add two leading zeros to show the full version number
-              in hexadecimal. For our case, I would write this number out as 0015002F. (When written on paper, a 0x is added to the beginning of
-              the number to clarify the number is hexadecimal, 0x0015002F.)
-            * Input the lower 4 hex characters (002F) into the calculator while in hex mode. Then convert this value to decimal by clicking the
-              decimal button. You should see a computer version number of 47 decimal.
-            * Input the upper 4 hex characters (0015) into the calculator while in hex mode. Then convert this value to decimal by clicking the
-              decimal button. You should see a user version number of 21 decimal.
-    #>
-
-    # Increment gpt.ini version number based on user or computer policy change.
-    $versionBytes = [System.BitConverter]::GetBytes([int]$gptVersion)
-    $loVersion = [System.BitConverter]::ToUInt16($versionBytes, 0)
-    $hiVersion = [System.BitConverter]::ToUInt16($versionBytes, 2)
-    if ($TargetType -eq 'ComputerConfiguration')
-    {
-        if ($loVersion -eq [uint16]::MaxValue)
-        {
-            # Once the GPT version hits the uint16 max (65535), the incremented number is reset to 1
-            $loVersion = 1
-        }
-        else
-        {
-            $loVersion++
-        }
-    }
-    else
-    {
-        if ($hiVersion -eq [uint16]::MaxValue)
-        {
-            # Once the GPT version hits the uint16 max (65535), the incremented number is reset to 1
-            $hiVersion = 1
-        }
-        else
-        {
-            $hiVersion++
-        }
-    }
-
-    # Convert lo/hi to byte array
-    $loVersionByte = [System.BitConverter]::GetBytes($loVersion)
-    $hiVersionByte = [System.BitConverter]::GetBytes($hiVersion)
-
-    # Create new byte array and convert to int32
-    $newGptVersionBytes = [byte[]]::new(4)
-    $newGptVersionBytes[0] = $loVersionByte[0]
-    $newGptVersionBytes[1] = $loVersionByte[1]
-    $newGptVersionBytes[2] = $hiVersionByte[0]
-    $newGptVersionBytes[3] = $hiVersionByte[1]
-    $newGptVersion = [System.BitConverter]::ToInt32($newGptVersionBytes, 0)
+    # Determine incremented version number
+    $newGptVersion = Get-IncrementedGptVersion -TargetType $TargetType -Version $gptVersion
 
     # Write incremented version to GPT
     Write-PrivateProfileString -AppName 'General' -KeyName 'Version' -KeyValue $newGptVersion -GptIniPath $gptIniPath
@@ -632,4 +576,79 @@ function Write-PrivateProfileString
         $KeyValue,
         $GptIniPath
     )
+}
+
+function Get-IncrementedGptVersion
+{
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Version,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $TargetType
+    )
+
+    <#
+        Ref: https://docs.microsoft.com/en-us/archive/blogs/grouppolicy/understanding-the-gpo-version-number
+        The version integer value in the GPT.ini has the following structure:
+            Version = [user version number top 16 bits] [computer version number lower 16 bits]
+        Below is a simple way to split the version number into the user and computer version number:
+            * First, recognize that the version number is in decimal. Before we can split the number into the two version numbers,
+              we first convert the decimal value to hex. The easiest way to perform this conversion is to use the calculator in windows
+              in scientific mode. Enter the decimal value and then click the hex button to convert the number. You should see a value of 15002F.
+            * If you are using the calculator, it will not display the leading zeros of the number. In hexadecimal, four hexadecimal characters
+              are equal to 16 bits. When you split the number into two parts you'll need to add two leading zeros to show the full version number
+              in hexadecimal. For our case, I would write this number out as 0015002F. (When written on paper, a 0x is added to the beginning of
+              the number to clarify the number is hexadecimal, 0x0015002F.)
+            * Input the lower 4 hex characters (002F) into the calculator while in hex mode. Then convert this value to decimal by clicking the
+              decimal button. You should see a computer version number of 47 decimal.
+            * Input the upper 4 hex characters (0015) into the calculator while in hex mode. Then convert this value to decimal by clicking the
+              decimal button. You should see a user version number of 21 decimal.
+    #>
+
+    # Increment gpt.ini version number based on user or computer policy change.
+    $versionBytes = [System.BitConverter]::GetBytes([int]$gptVersion)
+    $loVersion = [System.BitConverter]::ToUInt16($versionBytes, 0)
+    $hiVersion = [System.BitConverter]::ToUInt16($versionBytes, 2)
+    if ($TargetType -eq 'ComputerConfiguration')
+    {
+        if ($loVersion -eq [uint16]::MaxValue)
+        {
+            # Once the GPT version hits the uint16 max (65535), the incremented number is reset to 1
+            $loVersion = 1
+        }
+        else
+        {
+            $loVersion++
+        }
+    }
+    else
+    {
+        if ($hiVersion -eq [uint16]::MaxValue)
+        {
+            # Once the GPT version hits the uint16 max (65535), the incremented number is reset to 1
+            $hiVersion = 1
+        }
+        else
+        {
+            $hiVersion++
+        }
+    }
+
+    # Convert lo/hi to byte array
+    $loVersionByte = [System.BitConverter]::GetBytes($loVersion)
+    $hiVersionByte = [System.BitConverter]::GetBytes($hiVersion)
+
+    # Create new byte array and convert to int32
+    $newGptVersionBytes = [byte[]]::new(4)
+    $newGptVersionBytes[0] = $loVersionByte[0]
+    $newGptVersionBytes[1] = $loVersionByte[1]
+    $newGptVersionBytes[2] = $hiVersionByte[0]
+    $newGptVersionBytes[3] = $hiVersionByte[1]
+
+    return [System.BitConverter]::ToInt32($newGptVersionBytes, 0)
 }
