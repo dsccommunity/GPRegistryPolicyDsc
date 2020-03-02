@@ -10,5 +10,6 @@ ConvertFrom-StringData -StringData @'
     RetrievingCurrentState = Retrieving current for Key {0} ValueName {1}. (RPF04)
     InDesiredState = Resource is in desired state. No refresh required. (RPF05)
     AccountNameNull = No AccountName was provided. (RPF06)
-    GptIniUpdate = Gpt.ini updated based on {0}. (RPF07)
+    GptIniCseUpdate = Gpt.ini {0} CSE GUID updated from {1} to {2}. (RPF07)
+    GptIniVersionUpdate = Gpt.ini Version updated based on {0} from {1} to {2}. (RPF08)
 '@

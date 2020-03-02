@@ -20,7 +20,7 @@ $profileStringSignature = @'
     );
 '@
 
-Add-Type -MemberDefinition $profileStringSignature -Name GPRegistryPolicyDscIniUtility -Namespace GPRegistryPolicyDscTools -Using System.Text
+Add-Type -MemberDefinition $profileStringSignature -Name IniUtility -Namespace GPRegistryPolicyDsc -Using System.Text
 
 <#
     .SYNOPSIS

@@ -200,7 +200,6 @@ function Set-TargetResource
     }
 
     # write the gpt.ini update
-    Write-Verbose -Message ($script:localizedData.GptIniUpdate -f $TargetType)
     $setGptIniFileParams = @{
         TargetType = $TargetType
     }
@@ -452,6 +451,16 @@ function Set-RefreshRegistryKey
     New-ItemProperty -Path $Path -Name $PropertyName -Value $Value -Force
 }
 
+<#
+    .SYNOPSIS
+        Sets the gpt.ini file according to user/computer policy changes.
+
+    .PARAMETER TargetType
+        Indicates the target type. This is needed to determine the gpt.ini file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, Account.
+
+    .PARAMETER AccountName
+        Specifies the name of the account for an user specific gpt.ini file to be managed.
+#>
 function Set-GptIniFile
 {
     [CmdletBinding()]
@@ -492,6 +501,7 @@ function Set-GptIniFile
                 $gPCNewValue = $extensionHashtable[$gPCItem]
             }
             $formattedgPCNewValue = '[{{{0}}}]' -f $($gPCNewValue -join '}{')
+            Write-Verbose -Message ($script:localizedData.GptIniCseUpdate -f $gPCItem, $gptEntry, $formattedgPCNewValue)
             Write-PrivateProfileString -AppName 'General' -KeyName $gPCItem -KeyValue $formattedgPCNewValue -GptIniPath $gptIniPath
         }
 
@@ -509,12 +519,31 @@ function Set-GptIniFile
     $newGptVersion = Get-IncrementedGptVersion -TargetType $TargetType -Version $gptVersion
 
     # Write incremented version to GPT
+    Write-Verbose -Message ($script:localizedData.GptIniVersionUpdate -f $TargetType, $gptVersion, $newGptVersion)
     Write-PrivateProfileString -AppName 'General' -KeyName 'Version' -KeyValue $newGptVersion -GptIniPath $gptIniPath
 }
 
+<#
+    .SYNOPSIS
+        Queries an ini file for specific information.
+
+    .PARAMETER AppName
+        The name of the section containing the key name, in an ini file, also known as 'Section'.
+
+    .PARAMETER KeyName
+        The name of the key whose associated string is to be retrieved.
+
+    .PARAMETER Default
+        If the lpKeyName key cannot be found in the initialization file, GetPrivateProfileString
+        copies the default string to the lpReturnedString buffer.
+
+    .PARAMETER GptIniPath
+        Path to the gpt.ini file to be queried.
+#>
 function Get-PrivateProfileString
 {
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter()]
@@ -534,23 +563,40 @@ function Get-PrivateProfileString
         $GptIniPath
     )
 
-    $iniStringBuilder = [System.Text.StringBuilder]::new([int]65535)
+    $stringBuilder = [System.Text.StringBuilder]::new(65535)
 
-    [void][GPRegistryPolicyDscTools.GPRegistryPolicyDscIniUtility]::GetPrivateProfileString(
+    [void][GPRegistryPolicyDsc.IniUtility]::GetPrivateProfileString(
         $AppName,
         $KeyName,
         $Default,
-        $iniStringBuilder,
-        $iniStringBuilder.Capacity,
+        $stringBuilder,
+        $stringBuilder.Capacity,
         $GptIniPath
     )
 
-    return $iniStringBuilder.ToString()
+    return $stringBuilder.ToString()
 }
 
+<#
+    .SYNOPSIS
+        Writes information to an ini file.
+
+    .PARAMETER AppName
+        The name of the section containing the key name, in an ini file, also known as 'Section'.
+
+    .PARAMETER KeyName
+        The name of the key whose associated KeyValue string is to be written/modified.
+
+    .PARAMETER KeyValue
+        A null-terminated string to be written to the file.
+
+    .PARAMETER GptIniPath
+        Path to the gpt.ini file to be written/modified.
+#>
 function Write-PrivateProfileString
 {
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter()]
@@ -570,7 +616,7 @@ function Write-PrivateProfileString
         $GptIniPath
     )
 
-    [void][GPRegistryPolicyDscTools.GPRegistryPolicyDscIniUtility]::WritePrivateProfileString(
+    [void][GPRegistryPolicyDsc.IniUtility]::WritePrivateProfileString(
         $AppName,
         $KeyName,
         $KeyValue,
@@ -578,9 +624,20 @@ function Write-PrivateProfileString
     )
 }
 
+<#
+    .SYNOPSIS
+        Determines the incremented version number from the specified gpt.ini file.
+
+    .PARAMETER Version
+        The current gpt.ini version number which will be incremented based on TargetType.
+
+    .PARAMETER TargetType
+        Indicates the target type. This is needed to determine the gpt.ini file path. Supported values are LocalMachine, User, Administrators, NonAdministrators, Account.
+#>
 function Get-IncrementedGptVersion
 {
     [CmdletBinding()]
+    [OutputType([System.Int32])]
     Param
     (
         [Parameter(Mandatory = $true)]
