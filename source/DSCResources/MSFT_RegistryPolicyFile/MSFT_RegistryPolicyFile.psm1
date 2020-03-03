@@ -650,7 +650,7 @@ function Get-IncrementedGptVersion
 {
     [CmdletBinding()]
     [OutputType([System.Int32])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
