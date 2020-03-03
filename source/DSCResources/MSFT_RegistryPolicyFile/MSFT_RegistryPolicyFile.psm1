@@ -668,7 +668,7 @@ function Get-IncrementedGptVersion
     #>
 
     # Increment gpt.ini version number based on user or computer policy change.
-    $versionBytes = [System.BitConverter]::GetBytes([int]$gptVersion)
+    $versionBytes = [System.BitConverter]::GetBytes([int]$Version)
     $loVersion = [System.BitConverter]::ToUInt16($versionBytes, 0)
     $hiVersion = [System.BitConverter]::ToUInt16($versionBytes, 2)
     if ($TargetType -eq 'ComputerConfiguration')
