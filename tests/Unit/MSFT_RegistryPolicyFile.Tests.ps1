@@ -489,7 +489,7 @@ try
                     Assert-MockCalled -CommandName Write-PrivateProfileString -Times 1 -Exactly -ParameterFilter {
                         $AppName    -eq 'General' -and
                         $KeyName    -eq 'gPCUserExtensionNames' -and
-                        $KeyValue   -eq '[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{9E7A0555-0D98-4A5A-AB35-0A2CC0885A6A}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]' -and
+                        $KeyValue   -eq '[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{9E7A0555-0D98-4A5A-AB35-0A2CC0885A6A}{D02B1F73-3407-48AE-BA88-E8213C6761F1}]' -and
                         $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
                     }
 
@@ -517,35 +517,39 @@ try
 
         Describe 'MSFT_RegistryPolicyFile\Get-PrivateProfileString' -Tag 'Helper' {
             BeforeAll {
+                $tempGptIniFilePath = 'TestDrive:\tempGpt.ini'
                 $stringBuilder = [System.Text.StringBuilder]::new()
                 $stringBuilder.AppendLine('[TestSection]') | Out-Null
                 $stringBuilder.AppendLine('TestKey1=TestValue1') | Out-Null
                 $stringBuilder.AppendLine('TestKey2=TestValue2') | Out-Null
-                $stringBuilder.ToString().Trim() | Out-File -FilePath 'TestDrive:\test.ini'
+                $stringBuilder.ToString() | Out-File -FilePath $tempGptIniFilePath
             }
             Context 'When reading a gpt.ini file for Client Side Extension and Version information' {
                 It 'Should read the TestKey1 value from TestSection successfully' {
-                    $resultKeyOne = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -GptIniPath 'TestDrive:\test.ini'
+                    $resultKeyOne = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -GptIniPath $tempGptIniFilePath
                     $resultKeyOne | Should -Be 'TestValue1'
                 }
                 It 'Should read the TestKey2 value from TestSection successfully' {
-                    $resultKeyTwo = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey2' -GptIniPath 'TestDrive:\test.ini'
-                    $resultKeyTwo | Should -Be 'TestValue1'
+                    $resultKeyTwo = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey2' -GptIniPath $tempGptIniFilePath
+                    $resultKeyTwo | Should -Be 'TestValue2'
                 }
             }
         }
 
         Describe 'MSFT_RegistryPolicyFile\Write-PrivateProfileString' -Tag 'Helper' {
+            BeforeAll {
+                $tempGptIniFilePath = 'TestDrive:\tempGpt.ini'
+            }
             Context 'When writting a gpt.ini file for Client Side Extension and Version information' {
                 It 'Should write a new .ini file with a Key/Value pair (TestKey1=TestValue1) to "TestSection"' {
-                    Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'TestValue1' -GptIniPath 'TestDrive:\test.ini'
-                    $testIniContents = Get-Content -Path 'TestDrive:\test.ini'
+                    Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'TestValue1' -GptIniPath $tempGptIniFilePath
+                    $testIniContents = Get-Content -Path $tempGptIniFilePath
                     $testIniContents[0] | Should -Be '[TestSection]'
                     $testIniContents[1] | Should -Be 'TestKey1=TestValue1'
                 }
                 It 'Should modify an existing .ini file with a Key/Value pair (TestKey1=NewTestValue1) to "TestSection"' {
-                    Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'NewTestValue1' -GptIniPath 'TestDrive:\test.ini'
-                    $testIniContents = Get-Content -Path 'TestDrive:\test.ini'
+                    Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'NewTestValue1' -GptIniPath $tempGptIniFilePath
+                    $testIniContents = Get-Content -Path $tempGptIniFilePath
                     $testIniContents[0] | Should -Be '[TestSection]'
                     $testIniContents[1] | Should -Be 'TestKey1=NewTestValue1'
                 }

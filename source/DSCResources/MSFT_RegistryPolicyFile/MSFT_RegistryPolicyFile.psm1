@@ -563,6 +563,12 @@ function Get-PrivateProfileString
         $GptIniPath
     )
 
+    # The WritePrivateProfileString method requires a FileSystem path, meaning no PSDrive paths
+    $gptDirectoryPath = Split-Path -Path $GptIniPath -Parent
+    $gptFileName = Split-Path -Path $GptIniPath -Leaf
+    $fullyQualifiedDirectoryPath = Convert-Path -Path $gptDirectoryPath
+    $fullyQualifiedFilePath = Join-Path -Path $fullyQualifiedDirectoryPath -ChildPath $gptFileName
+
     $stringBuilder = [System.Text.StringBuilder]::new(65535)
 
     [void][GPRegistryPolicyDsc.IniUtility]::GetPrivateProfileString(
@@ -571,7 +577,7 @@ function Get-PrivateProfileString
         $Default,
         $stringBuilder,
         $stringBuilder.Capacity,
-        $GptIniPath
+        $fullyQualifiedFilePath
     )
 
     return $stringBuilder.ToString()
@@ -616,11 +622,17 @@ function Write-PrivateProfileString
         $GptIniPath
     )
 
+    # The WritePrivateProfileString method requires a FileSystem path, meaning no PSDrive paths
+    $gptDirectoryPath = Split-Path -Path $GptIniPath -Parent
+    $gptFileName = Split-Path -Path $GptIniPath -Leaf
+    $fullyQualifiedDirectoryPath = Convert-Path -Path $gptDirectoryPath
+    $fullyQualifiedFilePath = Join-Path -Path $fullyQualifiedDirectoryPath -ChildPath $gptFileName
+
     [void][GPRegistryPolicyDsc.IniUtility]::WritePrivateProfileString(
         $AppName,
         $KeyName,
         $KeyValue,
-        $GptIniPath
+        $fullyQualifiedFilePath
     )
 }
 
