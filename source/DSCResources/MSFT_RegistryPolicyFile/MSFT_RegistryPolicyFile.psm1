@@ -563,7 +563,7 @@ function Get-PrivateProfileString
         $GptIniPath
     )
 
-    # The WritePrivateProfileString method requires a FileSystem path, meaning no PSDrive paths
+    # The GetPrivateProfileString method requires a FileSystem path, meaning no PSDrive paths
     $gptDirectoryPath = Split-Path -Path $GptIniPath -Parent
     $gptFileName = Split-Path -Path $GptIniPath -Leaf
     $fullyQualifiedDirectoryPath = Convert-Path -Path $gptDirectoryPath
