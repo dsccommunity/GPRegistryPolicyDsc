@@ -441,18 +441,23 @@ try
                 Mock -CommandName Get-RegistryPolicyFilePath -MockWith {
                     return 'C:\Windows\System32\GroupPolicy\User\registry.pol'
                 }
+
                 Mock -CommandName Get-PrivateProfileString -ParameterFilter {$KeyName -eq 'gPCMachineExtensionNames'} -MockWith {
                     return [System.String]::Empty
                 }
+
                 Mock -CommandName Get-PrivateProfileString -ParameterFilter {$KeyName -eq 'gPCUserExtensionNames'} -MockWith {
                     return '[{9E7A0555-0D98-4A5A-AB35-0A2CC0885A6A}]'
                 }
+
                 Mock -CommandName Get-PrivateProfileString -ParameterFilter {$KeyName -eq 'Version'} -MockWith {
                     return '1'
                 }
+
                 Mock -CommandName Get-IncrementedGptVersion -MockWith {
                     return '2'
                 }
+
                 Mock -CommandName Write-PrivateProfileString
             }
             Context 'When writting/modifying a gpt.ini file to indicate an update to group policy' {
@@ -524,11 +529,13 @@ try
                 $stringBuilder.AppendLine('TestKey2=TestValue2') | Out-Null
                 $stringBuilder.ToString() | Out-File -FilePath $tempGptIniFilePath
             }
+
             Context 'When reading a gpt.ini file for Client Side Extension and Version information' {
                 It 'Should read the TestKey1 value from TestSection successfully' {
                     $resultKeyOne = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -GptIniPath $tempGptIniFilePath
                     $resultKeyOne | Should -Be 'TestValue1'
                 }
+
                 It 'Should read the TestKey2 value from TestSection successfully' {
                     $resultKeyTwo = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey2' -GptIniPath $tempGptIniFilePath
                     $resultKeyTwo | Should -Be 'TestValue2'
@@ -540,6 +547,7 @@ try
             BeforeAll {
                 $tempGptIniFilePath = 'TestDrive:\tempGpt.ini'
             }
+
             Context 'When writting a gpt.ini file for Client Side Extension and Version information' {
                 It 'Should write a new .ini file with a Key/Value pair (TestKey1=TestValue1) to "TestSection"' {
                     Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'TestValue1' -GptIniPath $tempGptIniFilePath
@@ -547,6 +555,7 @@ try
                     $testIniContents[0] | Should -Be '[TestSection]'
                     $testIniContents[1] | Should -Be 'TestKey1=TestValue1'
                 }
+
                 It 'Should modify an existing .ini file with a Key/Value pair (TestKey1=NewTestValue1) to "TestSection"' {
                     Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'NewTestValue1' -GptIniPath $tempGptIniFilePath
                     $testIniContents = Get-Content -Path $tempGptIniFilePath
@@ -563,6 +572,7 @@ try
                     Get-IncrementedGptVersion -TargetType UserConfiguration -Version 1 | Should -Be 65537
                     Get-IncrementedGptVersion -TargetType UserConfiguration -Version -65536 | Should -Be 65536
                 }
+                
                 It 'Should increment the gpt.ini version based on a ComputerConfiguration policy change' {
                     Get-IncrementedGptVersion -TargetType ComputerConfiguration -Version 0 | Should -Be 1
                     Get-IncrementedGptVersion -TargetType ComputerConfiguration -Version 65536 | Should -Be 65537

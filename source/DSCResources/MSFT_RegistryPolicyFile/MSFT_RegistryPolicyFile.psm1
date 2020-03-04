@@ -207,6 +207,7 @@ function Set-TargetResource
     {
         $setGptIniFileParams.AccountName = $AccountName
     }
+
     Set-GptIniFile @setGptIniFileParams
     Set-RefreshRegistryKey
 }
@@ -500,6 +501,7 @@ function Set-GptIniFile
             {
                 $gPCNewValue = $extensionHashtable[$gPCItem]
             }
+
             $formattedgPCNewValue = '[{{{0}}}]' -f $($gPCNewValue -join '}{')
             Write-Verbose -Message ($script:localizedData.GptIniCseUpdate -f $gPCItem, $gptEntry, $formattedgPCNewValue)
             Write-PrivateProfileString -AppName 'General' -KeyName $gPCItem -KeyValue $formattedgPCNewValue -GptIniPath $gptIniPath
@@ -528,14 +530,14 @@ function Set-GptIniFile
         Queries an ini file for specific information.
 
     .PARAMETER AppName
-        The name of the section containing the key name, in an ini file, also known as 'Section'.
+        The name of the section containing the key name in an ini file, also known as 'Section'.
 
     .PARAMETER KeyName
         The name of the key whose associated string is to be retrieved.
 
     .PARAMETER Default
-        If the lpKeyName key cannot be found in the initialization file, GetPrivateProfileString
-        copies the default string to the lpReturnedString buffer.
+        If the KeyName key cannot be found in the initialization file, GetPrivateProfileString
+        copies the default string to the ReturnedString buffer.
 
     .PARAMETER GptIniPath
         Path to the gpt.ini file to be queried.
@@ -588,7 +590,7 @@ function Get-PrivateProfileString
         Writes information to an ini file.
 
     .PARAMETER AppName
-        The name of the section containing the key name, in an ini file, also known as 'Section'.
+        The name of the section containing the key name in an ini file, also known as 'Section'.
 
     .PARAMETER KeyName
         The name of the key whose associated KeyValue string is to be written/modified.
@@ -657,12 +659,13 @@ function Get-IncrementedGptVersion
         $Version,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet('ComputerConfiguration','UserConfiguration','Administrators','NonAdministrators','Account')]
         [System.String]
         $TargetType
     )
 
     <#
-        Ref: https://docs.microsoft.com/en-us/archive/blogs/grouppolicy/understanding-the-gpo-version-number
+        Reference: https://docs.microsoft.com/en-us/archive/blogs/grouppolicy/understanding-the-gpo-version-number
         The version integer value in the GPT.ini has the following structure:
             Version = [user version number top 16 bits] [computer version number lower 16 bits]
         Below is a simple way to split the version number into the user and computer version number:
@@ -681,8 +684,9 @@ function Get-IncrementedGptVersion
 
     # Increment gpt.ini version number based on user or computer policy change.
     $versionBytes = [System.BitConverter]::GetBytes([int]$Version)
-    $loVersion = [System.BitConverter]::ToUInt16($versionBytes, 0)
-    $hiVersion = [System.BitConverter]::ToUInt16($versionBytes, 2)
+    $loVersion    = [System.BitConverter]::ToUInt16($versionBytes, 0)
+    $hiVersion    = [System.BitConverter]::ToUInt16($versionBytes, 2)
+
     if ($TargetType -eq 'ComputerConfiguration')
     {
         if ($loVersion -eq [uint16]::MaxValue)
