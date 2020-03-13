@@ -1,6 +1,37 @@
 $script:modulesFolderPath = Split-Path -Path $PSScriptRoot -Parent
 
 <#
+    GetPrivateProfileString and WritePrivateProfileString are functions exposed via kernel32.dll that allow for reading and
+    creating/modifying .ini files respectively.  These signatures are defined below and exposed when the module is imported
+    to be used in correctly configuring the gpt.ini file in order for Group Policy to be processed successfully.
+    Reference:
+    GetPrivateProfileString:   https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getprivateprofilestring
+    WritePrivateProfileString: https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-writeprivateprofilestringa
+#>
+
+$profileStringSignature = @'
+    [DllImport("kernel32.dll")]
+    public static extern uint GetPrivateProfileString(
+        string lpAppName,
+        string lpKeyName,
+        string lpDefault,
+        StringBuilder lpReturnedString,
+        uint nSize,
+        string lpFileName
+    );
+
+    [DllImport("kernel32.dll")]
+    public static extern bool WritePrivateProfileString(
+        string lpAppName,
+        string lpKeyName,
+        string lpString,
+        string lpFileName
+    );
+'@
+
+Add-Type -MemberDefinition $profileStringSignature -Name IniUtility -Namespace GPRegistryPolicyDsc -Using System.Text
+
+<#
     .SYNOPSIS
         This method is used to compare current and desired values for any DSC resource.
 

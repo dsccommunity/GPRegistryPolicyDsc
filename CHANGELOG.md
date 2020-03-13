@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - GPRegistryPolicyDsc
   - Update GitVersion.yml with the correct regular expression.
+  - Added GPT.ini creation/updating logic in order to properly apply Group Policy.
 
 ### Changed
 

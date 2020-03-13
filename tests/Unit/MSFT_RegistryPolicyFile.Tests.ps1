@@ -435,6 +435,151 @@ try
                 }
             }
         }
+
+        Describe 'MSFT_RegistryPolicyFile\Set-GptIniFile' -Tag 'Helper' {
+            BeforeAll {
+                Mock -CommandName Get-RegistryPolicyFilePath -MockWith {
+                    return 'C:\Windows\System32\GroupPolicy\User\registry.pol'
+                }
+
+                Mock -CommandName Get-PrivateProfileString -ParameterFilter {$KeyName -eq 'gPCMachineExtensionNames'} -MockWith {
+                    return [System.String]::Empty
+                }
+
+                Mock -CommandName Get-PrivateProfileString -ParameterFilter {$KeyName -eq 'gPCUserExtensionNames'} -MockWith {
+                    return '[{9E7A0555-0D98-4A5A-AB35-0A2CC0885A6A}]'
+                }
+
+                Mock -CommandName Get-PrivateProfileString -ParameterFilter {$KeyName -eq 'Version'} -MockWith {
+                    return '1'
+                }
+
+                Mock -CommandName Get-IncrementedGptVersion -MockWith {
+                    return '2'
+                }
+
+                Mock -CommandName Write-PrivateProfileString
+            }
+            Context 'When writting/modifying a gpt.ini file to indicate an update to group policy' {
+                It 'Should update/modify the correct gpt.ini file' {
+
+                    {Set-GptIniFile -TargetType 'ComputerConfiguration'} | Should -Not -Throw
+
+                    Assert-MockCalled -CommandName Get-RegistryPolicyFilePath -Times 1 -Exactly
+                    Assert-MockCalled -CommandName Get-PrivateProfileString -Times 1 -Exactly -ParameterFilter {
+                        $AppName    -eq 'General' -and
+                        $KeyName    -eq 'gPCMachineExtensionNames' -and
+                        $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
+                    }
+
+                    Assert-MockCalled -CommandName Get-PrivateProfileString -Times 1 -Exactly -ParameterFilter {
+                        $AppName    -eq 'General' -and
+                        $KeyName    -eq 'gPCUserExtensionNames' -and
+                        $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
+                    }
+
+                    Assert-MockCalled -CommandName Get-PrivateProfileString -Times 2 -Exactly -ParameterFilter {
+                        $AppName    -eq 'General' -and
+                        $KeyName    -eq 'Version' -and
+                        $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
+                    }
+
+                    Assert-MockCalled -CommandName Write-PrivateProfileString -Times 1 -Exactly -ParameterFilter {
+                        $AppName    -eq 'General' -and
+                        $KeyName    -eq 'gPCMachineExtensionNames' -and
+                        $KeyValue   -eq '[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]' -and
+                        $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
+                    }
+
+                    Assert-MockCalled -CommandName Write-PrivateProfileString -Times 1 -Exactly -ParameterFilter {
+                        $AppName    -eq 'General' -and
+                        $KeyName    -eq 'gPCUserExtensionNames' -and
+                        $KeyValue   -eq '[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{9E7A0555-0D98-4A5A-AB35-0A2CC0885A6A}{D02B1F73-3407-48AE-BA88-E8213C6761F1}]' -and
+                        $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
+                    }
+
+                    Assert-MockCalled -CommandName Write-PrivateProfileString -Times 2 -Exactly -ParameterFilter {
+                        $AppName    -eq 'General' -and
+                        $KeyName    -eq 'Version' -and
+                        $KeyValue   -eq '1' -and
+                        $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
+                    }
+
+                    Assert-MockCalled -CommandName Write-PrivateProfileString -Times 1 -Exactly -ParameterFilter {
+                        $AppName    -eq 'General' -and
+                        $KeyName    -eq 'Version' -and
+                        $KeyValue   -eq '2' -and
+                        $GptIniPath -eq 'C:\Windows\System32\GroupPolicy\gpt.ini'
+                    }
+
+                    Assert-MockCalled -CommandName Get-IncrementedGptVersion -Times 1 -Exactly -ParameterFilter {
+                        $TargetType -eq 'ComputerConfiguration' -and
+                        $Version    -eq '1'
+                    }
+                }
+            }
+        }
+
+        Describe 'MSFT_RegistryPolicyFile\Get-PrivateProfileString' -Tag 'Helper' {
+            BeforeAll {
+                $tempGptIniFilePath = 'TestDrive:\tempGpt.ini'
+                $stringBuilder = [System.Text.StringBuilder]::new()
+                $stringBuilder.AppendLine('[TestSection]') | Out-Null
+                $stringBuilder.AppendLine('TestKey1=TestValue1') | Out-Null
+                $stringBuilder.AppendLine('TestKey2=TestValue2') | Out-Null
+                $stringBuilder.ToString() | Out-File -FilePath $tempGptIniFilePath
+            }
+
+            Context 'When reading a gpt.ini file for Client Side Extension and Version information' {
+                It 'Should read the TestKey1 value from TestSection successfully' {
+                    $resultKeyOne = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -GptIniPath $tempGptIniFilePath
+                    $resultKeyOne | Should -Be 'TestValue1'
+                }
+
+                It 'Should read the TestKey2 value from TestSection successfully' {
+                    $resultKeyTwo = Get-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey2' -GptIniPath $tempGptIniFilePath
+                    $resultKeyTwo | Should -Be 'TestValue2'
+                }
+            }
+        }
+
+        Describe 'MSFT_RegistryPolicyFile\Write-PrivateProfileString' -Tag 'Helper' {
+            BeforeAll {
+                $tempGptIniFilePath = 'TestDrive:\tempGpt.ini'
+            }
+
+            Context 'When writting a gpt.ini file for Client Side Extension and Version information' {
+                It 'Should write a new .ini file with a Key/Value pair (TestKey1=TestValue1) to "TestSection"' {
+                    Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'TestValue1' -GptIniPath $tempGptIniFilePath
+                    $testIniContents = Get-Content -Path $tempGptIniFilePath
+                    $testIniContents[0] | Should -Be '[TestSection]'
+                    $testIniContents[1] | Should -Be 'TestKey1=TestValue1'
+                }
+
+                It 'Should modify an existing .ini file with a Key/Value pair (TestKey1=NewTestValue1) to "TestSection"' {
+                    Write-PrivateProfileString -AppName 'TestSection' -KeyName 'TestKey1' -KeyValue 'NewTestValue1' -GptIniPath $tempGptIniFilePath
+                    $testIniContents = Get-Content -Path $tempGptIniFilePath
+                    $testIniContents[0] | Should -Be '[TestSection]'
+                    $testIniContents[1] | Should -Be 'TestKey1=NewTestValue1'
+                }
+            }
+        }
+
+        Describe 'MSFT_RegistryPolicyFile\Get-IncrementedGptVersion' -Tag 'Helper' {
+            Context 'When determining the correct incremented gpt.ini version, based on Computer and/or User policy updates' {
+                It 'Should increment the gpt.ini version based on a UserConfiguration policy change' {
+                    Get-IncrementedGptVersion -TargetType UserConfiguration -Version 0 | Should -Be 65536
+                    Get-IncrementedGptVersion -TargetType UserConfiguration -Version 1 | Should -Be 65537
+                    Get-IncrementedGptVersion -TargetType UserConfiguration -Version -65536 | Should -Be 65536
+                }
+                
+                It 'Should increment the gpt.ini version based on a ComputerConfiguration policy change' {
+                    Get-IncrementedGptVersion -TargetType ComputerConfiguration -Version 0 | Should -Be 1
+                    Get-IncrementedGptVersion -TargetType ComputerConfiguration -Version 65536 | Should -Be 65537
+                    Get-IncrementedGptVersion -TargetType ComputerConfiguration -Version 65535 | Should -Be 1
+                }
+            }
+        }
     }
 }
 finally
