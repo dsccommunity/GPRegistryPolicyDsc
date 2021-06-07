@@ -305,9 +305,22 @@ function New-GPRegistrySettingsEntry
     # get data bytes then compute byte size based on data and type
     switch ($RegistryPolicy.ValueType)
     {
-        { @([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ, [RegType]::REG_MULTI_SZ) -contains $_ }
+        { @([RegType]::REG_SZ, [RegType]::REG_EXPAND_SZ) -contains $_ }
         {
             $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($RegistryPolicy.ValueData + "`0")
+            $dataSize = $dataBytes.Count
+        }
+
+        ([RegType]::REG_MULTI_SZ)
+        {
+            <#
+                When REG_MULTI_SZ ValueData contains an array, we need to null terminate each item. Furthermore
+                "Data in the Data field to be interpreted as a sequence of characters terminated by two null Unicode
+                characters, and within that sequence zero or more null-terminated Unicode strings can exist."
+                https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpreg/5c092c22-bf6b-4e7f-b180-b20743d368f5
+            #>
+            $valueDataNullTermJoin = $RegistryPolicy.ValueData -join "`0"
+            $dataBytes = [System.Text.Encoding]::Unicode.GetBytes($valueDataNullTermJoin + "`0`0")
             $dataSize = $dataBytes.Count
         }
 
