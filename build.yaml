@@ -2,7 +2,7 @@
 ####################################################
 #          ModuleBuilder Configuration             #
 ####################################################
-CopyDirectories:
+CopyPaths:
   - en-US
   - DSCResources
   - Modules
@@ -36,7 +36,7 @@ BuildWorkflow:
 
   publish:
     - Publish_release_to_GitHub
-    - publish_module_to_gallery # runs if nuget is not available
+    - publish_module_to_gallery
 
 
 ####################################################
