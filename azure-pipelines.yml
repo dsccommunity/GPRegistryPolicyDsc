@@ -8,6 +8,14 @@ trigger:
     exclude:
     - "*-*"
 
+variables:
+  buildFolderName: output
+  buildArtifactName: output
+  testResultFolderName: testResults
+  testArtifactName: 'testResults_$(System.JobAttempt)'
+  sourceFolderName: source
+  defaultBranch: master
+
 stages:
   - stage: Build
     jobs:
