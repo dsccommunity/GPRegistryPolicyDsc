@@ -5,6 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added DscResources.Common in submodule instead of GPRegistryPolicyDsc.Common [issue#30](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/30).
+
+### Removed
+
+- Removed GPRegistryPolicyDsc.Common submodule [issue#30](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/30) and its pester tests.
+
 ### Fixed
 
 - GPRegistryPolicyDsc

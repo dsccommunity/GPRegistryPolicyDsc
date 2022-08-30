@@ -38,6 +38,15 @@ BuildWorkflow:
     - Publish_release_to_GitHub
     - publish_module_to_gallery
 
+####################################################
+#     Dependent Modules Configuration (Sampler)    #
+####################################################
+NestedModule:
+  DscResource.Common:
+    CopyOnly: true
+    Path: ./output/RequiredModules/DscResource.Common
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
 
 ####################################################
 #       PESTER  Configuration                      #
