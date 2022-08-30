@@ -55,6 +55,7 @@ NestedModule:
 Pester:
   OutputFormat: NUnitXML
   ExcludeFromCodeCoverage:
+    - Modules\DscResource.Common
   Script:
     - tests/Unit
   ExcludeTag:
