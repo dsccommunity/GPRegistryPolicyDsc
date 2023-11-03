@@ -1,12 +1,13 @@
 using module ..\..\Modules\GPRegistryPolicyFileParser
 $script:resourceModulePath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
 $script:modulesFolderPath = Join-Path -Path $script:resourceModulePath -ChildPath 'Modules'
-$script:resourceHelperModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'GPRegistryPolicyDsc.Common'
 $script:GPRegistryPolicyFileParserModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'GPRegistryPolicyFileParser'
-Import-Module -Name (Join-Path -Path $script:resourceHelperModulePath -ChildPath 'GPRegistryPolicyDsc.Common.psm1')
-Import-Module -Name (Join-Path -Path $script:GPRegistryPolicyFileParserModulePath -ChildPath 'GPRegistryPolicyFileParser.psm1')
+$script:resourceHelperModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'DscResource.Common'
 
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_RegistryPolicyFile'
+Import-Module -Name $script:GPRegistryPolicyFileParserModulePath
+Import-Module -Name $script:resourceHelperModulePath
+
+$script:localizedData = Get-LocalizedData -DefaultUICulture en-US
 
 <#
     .SYNOPSIS
@@ -297,7 +298,7 @@ function Test-TargetResource
             'Ensure'
         )
 
-        $testTargetResourceResult = Test-DscParameterState -CurrentValues $getTargetResourceResult -DesiredValues $PSBoundParameters -ValuesToCheck $valuesToCheck
+    $testTargetResourceResult = DSCResource.Common\Test-DscParameterState -CurrentValues $getTargetResourceResult -DesiredValues $PSBoundParameters -Properties $valuesToCheck -TurnOffTypeChecking
     }
     else
     {

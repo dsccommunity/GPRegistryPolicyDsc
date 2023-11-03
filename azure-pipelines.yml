@@ -15,7 +15,7 @@ variables:
   buildFolderName: output
   buildArtifactName: output
   testResultFolderName: testResults
-  testArtifactName: testResults
+  testArtifactName: 'testResults_$(System.JobAttempt)'
   sourceFolderName: source
   defaultBranch: master
 
@@ -71,6 +71,7 @@ stages:
           - task: PowerShell@2
             name: test
             displayName: 'Run HQRM Test'
+            condition: succeededOrFailed()
             inputs:
               filePath: './build.ps1'
               arguments: '-Tasks hqrmtest'
@@ -80,7 +81,7 @@ stages:
             condition: succeededOrFailed()
             inputs:
               testResultsFormat: 'NUnit'
-              testResultsFiles: 'output/testResults/NUnit*.xml'
+              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
               testRunTitle: 'HQRM'
 
       - job: Test_Unit
@@ -111,6 +112,7 @@ stages:
               testRunTitle: 'Unit'
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Test Artifact'
+            condition: succeededOrFailed()
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
               artifactName: $(testArtifactName)

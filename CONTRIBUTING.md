@@ -68,8 +68,9 @@ prefixed with just 'Sql'
 
 Helper functions that are only used by one resource
 so preferably be put in the same script file as the resource.
-Helper function that can used by more than one resource can preferably
-be placed in the resource module file [GPRegistryPolicyDsc.Common](/source/Modules/GPRegistryPolicyDsc.Common/GPRegistryPolicyDsc.Common.psm1).
+Helper function that can used by more than one resource can be
+placed in a resource module file GPRegistryPolicyDsc.Common or
+preferably in the common module [DscResource.Common](https://github.com/dsccommunity/DscResource.Common).
 
 ### Documentation with Markdown
 
