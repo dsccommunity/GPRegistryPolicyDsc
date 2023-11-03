@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removed GPRegistryPolicyDsc.Common submodule [issue#30](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/30) and its pester tests.
 
+### Fixed
+
+- Fixed azure Devops pipeline.
+
 ## [1.3.1] - 2023-11-03
 
 ### Fixed
@@ -31,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - GPRegistryPolicyDsc
   - Fixed REG_MULTI_SZ double null termination issue ([issue #25](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/25)).
-- Fixed azure Devops pipeline.
 
 ## [1.2.0] - 2020-03-13
 
