@@ -1,10 +1,10 @@
 $script:resourceModulePath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
 $script:modulesFolderPath = Join-Path -Path $script:resourceModulePath -ChildPath 'Modules'
+$script:resourceHelperModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'DscResource.Common'
 
-$script:resourceHelperModulePath = Join-Path -Path $script:modulesFolderPath -ChildPath 'GPRegistryPolicyDsc.Common'
-Import-Module -Name (Join-Path -Path $script:resourceHelperModulePath -ChildPath 'GPRegistryPolicyDsc.Common.psm1')
+Import-Module -Name $script:resourceHelperModulePath
 
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_RefreshRegistryPolicy'
+$script:localizedData = Get-LocalizedData -DefaultUICulture en-US
 
 <#
     .SYNOPSIS

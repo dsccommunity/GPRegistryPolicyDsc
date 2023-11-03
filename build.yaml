@@ -42,12 +42,23 @@ BuildWorkflow:
     - Publish_GitHub_Wiki_Content
 
 ####################################################
+#     Dependent Modules Configuration (Sampler)    #
+####################################################
+NestedModule:
+  DscResource.Common:
+    CopyOnly: true
+    Path: ./output/RequiredModules/DscResource.Common
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
+
+####################################################
 #       PESTER Configuration                       #
 ####################################################
 
 Pester:
   OutputFormat: NUnitXML
   ExcludeFromCodeCoverage:
+    - Modules/DscResource.Common
   Script:
     - tests/Unit
   ExcludeTag:
@@ -64,6 +75,7 @@ DscTest:
   ExcludeSourceFile:
     - output
   ExcludeModuleFile:
+    - Modules/DscResource.Common
   MainGitBranch: master
 
 ModuleBuildTasks:
