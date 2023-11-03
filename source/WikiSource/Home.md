@@ -1,4 +1,4 @@
-# Welcome to the SqlServerDsc wiki
+# Welcome to the GPRegistryPolicyDsc wiki
 
 <sup>*GPRegistryPolicyDsc v#.#.#*</sup>
 
