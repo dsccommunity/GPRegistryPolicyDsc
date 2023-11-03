@@ -5,6 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2023-11-03
+
+### Fixed
+
+- GPRegistryPolicyDsc
+  - Fixed the GitHub repository wiki home page.
+
+## [1.3.0] - 2023-11-03
+
 ### Changes
 
 - GPRegistryPolicyDsc
