@@ -687,7 +687,7 @@ class GPRegistryPolicy
             }
             ([RegType]::REG_DWORD)
             {
-                $Result = 'DWord'
+                $Result = 'Dword'
             }
             ([RegType]::REG_MULTI_SZ)
             {
@@ -695,7 +695,7 @@ class GPRegistryPolicy
             }
             ([RegType]::REG_QWORD)
             {
-                $Result = 'QWord'
+                $Result = 'Qword'
             }
             default
             {
@@ -724,7 +724,7 @@ class GPRegistryPolicy
             {
                 $result = [RegType]::REG_BINARY
             }
-            'DWord'
+            'Dword'
             {
                 $result = [RegType]::REG_DWORD
             }
@@ -732,7 +732,7 @@ class GPRegistryPolicy
             {
                 $result = [RegType]::REG_MULTI_SZ
             }
-            'QWord'
+            'Qword'
             {
                 $result = [RegType]::REG_QWORD
             }
