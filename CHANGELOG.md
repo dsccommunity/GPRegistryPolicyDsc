@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.1] - 2023-11-03
 
+### Fixed
+ß
+- GPRegistryPolicyDsc
+  - Fixed the GitHub repository wiki home page.
+
+## [1.3.0] - 2023-11-03
+
 ### Changes
 
 - GPRegistryPolicyDsc
@@ -16,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - GPRegistryPolicyDsc
   - Fixed REG_MULTI_SZ double null termination issue ([issue #25](https://github.com/dsccommunity/GPRegistryPolicyDsc/issues/25)).
-  - Fixed the GitHub repository wiki home page.
 
 ## [1.2.0] - 2020-03-13
 
